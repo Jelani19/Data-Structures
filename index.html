@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>DS Study Hub — Data Structures & Algorithms in C++</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<style>
+/* ===================== TOKENS ===================== */
+:root {
+  --bg:       #060b14;
+  --bg2:      #0d1525;
+  --bg3:      #141f35;
+  --panel:    rgba(255,255,255,0.05);
+  --border:   rgba(255,255,255,0.10);
+  --border2:  rgba(255,255,255,0.16);
+  --text:     #e8f0ff;
+  --muted:    #8fa3c8;
+  --dim:      #4a5e80;
+  --accent:   #4f8eff;
+  --accent2:  #36d9a8;
+  --warn:     #f59e0b;
+  --danger:   #f06060;
+  --success:  #36d9a8;
+  --glow:     rgba(79,142,255,0.22);
+  --glow2:    rgba(54,217,168,0.18);
+
+  --p1: #a78bfa;
+  --p2: #38bdf8;
+  --p3: #34d399;
+  --p4: #fb923c;
+
+  --ff-head: 'Syne', sans-serif;
+  --ff-body: 'DM Sans', sans-serif;
+  --ff-mono: 'JetBrains Mono', monospace;
+
+  --r: 18px;
+  --r2: 12px;
+  --shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+[data-theme="light"] {
+  --bg:    #f0f4ff;
+  --bg2:   #e4eaf8;
+  --bg3:   #d8e2f5;
+  --panel: rgba(255,255,255,0.7);
+  --border: rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.15);
+  --text:  #0d1525;
+  --muted: #3d5177;
+  --dim:   #8fa3c8;
+  --accent: #2563eb;
+  --accent2: #059669;
+  --glow:  rgba(37,99,235,0.15);
+  --glow2: rgba(5,150,105,0.12);
+  --shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+/* ===================== RESET ===================== */
+*,::after,::before{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--ff-body);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.68;
+  min-height:100vh;
+  transition:background .3s,color .3s;
+}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
+button{cursor:pointer;font-family:inherit}
+input{font-family:inherit}
+ul{list-style:none;padding:0}
+
+/* ===================== LAYOUT ===================== */
+.wrap{width:min(1160px,calc(100% - 32px));margin:0 auto}
+
+/* ===================== NAV ===================== */
+.navbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(6,11,20,.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  transition:background .3s;
+}
+[data-theme="light"] .navbar{background:rgba(240,244,255,.88)}
+.nav-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 0;gap:12px;flex-wrap:wrap;
+}
+.brand{
+  font-family:var(--ff-head);font-weight:800;font-size:1.15rem;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.nav-links{display:flex;flex-wrap:wrap;gap:4px}
+.nav-links a{
+  padding:7px 11px;border-radius:8px;color:var(--muted);font-size:.88rem;
+  transition:background .15s,color .15s;
+}
+.nav-links a:hover{background:var(--panel);color:var(--text);text-decoration:none}
+.nav-right{display:flex;gap:8px;align-items:center}
+
+/* Search */
+.search-wrap{position:relative}
+#search{
+  background:var(--panel);border:1px solid var(--border);
+  color:var(--text);border-radius:10px;
+  padding:8px 12px 8px 36px;font-size:.88rem;width:200px;
+  transition:border-color .2s,width .2s;outline:none;
+}
+#search:focus{border-color:var(--accent);width:240px}
+.search-icon{
+  position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  color:var(--dim);pointer-events:none;
+}
+
+/* Theme toggle */
+.theme-btn{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;padding:7px 10px;color:var(--muted);
+  font-size:1.05rem;transition:all .2s;
+}
+.theme-btn:hover{border-color:var(--accent);color:var(--text)}
+
+/* ===================== HERO ===================== */
+.hero{padding:56px 0 28px;position:relative;overflow:hidden}
+.hero::before{
+  content:'';position:absolute;top:-120px;left:-80px;
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(79,142,255,.14),transparent 70%);
+  pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;top:-60px;right:-100px;
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(54,217,168,.10),transparent 70%);
+  pointer-events:none;
+}
+.hero-card{
+  background:linear-gradient(135deg,rgba(79,142,255,.10),rgba(54,217,168,.06));
+  border:1px solid var(--border2);border-radius:28px;
+  padding:40px;box-shadow:var(--shadow);
+  display:grid;grid-template-columns:1.5fr 1fr;gap:28px;align-items:start;
+}
+@media(max-width:800px){.hero-card{grid-template-columns:1fr}}
+.eyebrow{
+  display:inline-block;padding:6px 14px;border-radius:999px;
+  background:var(--panel);border:1px solid var(--border);
+  color:var(--accent2);font-size:.82rem;font-family:var(--ff-mono);
+  margin-bottom:16px;
+}
+h1{
+  font-family:var(--ff-head);font-size:clamp(2rem,4.5vw,3.6rem);
+  line-height:1.08;letter-spacing:-.03em;margin-bottom:14px;
+}
+.hero-desc{color:var(--muted);font-size:1rem;max-width:640px;margin-bottom:22px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{
+  padding:6px 12px;border-radius:999px;
+  background:var(--panel);border:1px solid var(--border);
+  color:var(--muted);font-size:.82rem;
+}
+
+/* Stats grid */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.stat{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:16px;padding:16px;
+}
+.stat strong{font-family:var(--ff-head);font-size:1.9rem;display:block;color:var(--text)}
+.stat span{color:var(--muted);font-size:.82rem}
+
+/* Progress bar */
+.global-progress{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px 22px;margin:20px 0;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.gp-label{font-family:var(--ff-head);font-weight:700;font-size:.95rem;white-space:nowrap}
+.gp-bar-wrap{flex:1;min-width:200px;background:var(--bg3);border-radius:999px;height:10px;overflow:hidden}
+.gp-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s ease;width:0%}
+.gp-score{font-family:var(--ff-mono);font-size:.9rem;color:var(--accent2);white-space:nowrap}
+
+/* ===================== SECTION ===================== */
+section{padding:28px 0}
+.section-title{
+  font-family:var(--ff-head);font-size:1.75rem;letter-spacing:-.02em;
+  margin-bottom:6px;
+}
+.section-sub{color:var(--muted);margin-bottom:20px;max-width:800px}
+
+/* ===================== ROADMAP ===================== */
+.roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:900px){.roadmap{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.roadmap{grid-template-columns:1fr}}
+.phase{
+  border-radius:var(--r);padding:18px;
+  background:var(--panel);border:1px solid var(--border);
+  border-top:4px solid var(--p1);
+}
+.phase.p2{border-top-color:var(--p2)}
+.phase.p3{border-top-color:var(--p3)}
+.phase.p4{border-top-color:var(--p4)}
+.phase h3{font-family:var(--ff-head);font-size:1rem;margin-bottom:10px}
+.phase li{color:var(--muted);font-size:.85rem;padding:3px 0;padding-left:12px;position:relative}
+.phase li::before{content:'›';position:absolute;left:0;color:var(--dim)}
+
+/* ===================== CHAPTERS ===================== */
+.chapters-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:800px){.chapters-grid{grid-template-columns:1fr}}
+
+.chapter-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.chapter-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+
+.chapter-header{
+  display:flex;align-items:center;gap:12px;padding:18px 20px;
+  cursor:pointer;user-select:none;
+  transition:background .15s;
+}
+.chapter-header:hover{background:rgba(255,255,255,.04)}
+.ch-num{
+  font-family:var(--ff-mono);font-size:.78rem;color:var(--dim);
+  min-width:32px;
+}
+.ch-title{font-family:var(--ff-head);font-size:1.02rem;font-weight:700;flex:1}
+.ch-badge-group{display:flex;gap:6px;align-items:center}
+.badge{
+  padding:4px 9px;border-radius:999px;font-size:.76rem;
+  background:var(--panel);border:1px solid var(--border);color:var(--muted);
+  font-family:var(--ff-mono);
+}
+.ch-arrow{
+  color:var(--dim);font-size:.85rem;transition:transform .25s;margin-left:4px;
+}
+.chapter-card.open .ch-arrow{transform:rotate(180deg)}
+
+/* Score chip on card */
+.ch-score-chip{
+  font-family:var(--ff-mono);font-size:.78rem;
+  padding:3px 9px;border-radius:999px;
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--dim);white-space:nowrap;
+}
+.ch-score-chip.scored{color:var(--accent2);border-color:var(--accent2)}
+.ch-score-chip.perfect{color:#ffd700;border-color:#ffd700}
+
+.chapter-body{
+  display:none;padding:0 20px 20px;
+}
+.chapter-card.open .chapter-body{display:block}
+
+.ch-desc{color:var(--muted);font-size:.9rem;margin-bottom:14px}
+.ch-topics{margin-bottom:16px}
+.ch-topics li{
+  color:var(--muted);font-size:.85rem;padding:3px 0 3px 14px;position:relative;
+}
+.ch-topics li::before{content:'•';position:absolute;left:2px;color:var(--accent)}
+
+/* ===================== QUIZ ===================== */
+.quiz-wrap{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r2);padding:18px;margin-top:4px;
+}
+.quiz-title{
+  font-family:var(--ff-head);font-size:.92rem;margin-bottom:14px;
+  color:var(--accent);display:flex;align-items:center;gap:8px;
+}
+.quiz-q{margin-bottom:18px}
+.quiz-q-text{
+  font-size:.9rem;margin-bottom:10px;font-weight:500;color:var(--text);
+}
+.quiz-q-num{
+  font-family:var(--ff-mono);font-size:.75rem;color:var(--dim);margin-bottom:4px;
+}
+.quiz-options{display:flex;flex-direction:column;gap:7px}
+.quiz-opt{
+  display:flex;align-items:flex-start;gap:10px;padding:9px 12px;
+  border-radius:10px;border:1px solid var(--border);background:var(--panel);
+  cursor:pointer;transition:border-color .15s,background .15s;
+  font-size:.87rem;color:var(--muted);text-align:left;
+}
+.quiz-opt:hover:not(:disabled){border-color:var(--accent);color:var(--text)}
+.quiz-opt .opt-key{
+  font-family:var(--ff-mono);font-size:.78rem;
+  min-width:20px;color:var(--dim);margin-top:1px;
+}
+.quiz-opt.correct{
+  border-color:var(--success)!important;
+  background:rgba(54,217,168,.10)!important;
+  color:var(--text)!important;
+}
+.quiz-opt.wrong{
+  border-color:var(--danger)!important;
+  background:rgba(240,96,96,.10)!important;
+  color:var(--text)!important;
+}
+.quiz-opt.disabled{cursor:not-allowed;opacity:.7}
+
+.explanation{
+  margin-top:10px;padding:10px 12px;border-radius:10px;
+  background:rgba(79,142,255,.08);border:1px solid rgba(79,142,255,.22);
+  font-size:.84rem;color:var(--muted);display:none;
+}
+.explanation.show{display:block}
+.explanation strong{color:var(--accent);display:block;margin-bottom:3px}
+
+.quiz-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.btn{
+  padding:9px 18px;border-radius:10px;border:none;font-size:.87rem;
+  font-weight:600;transition:all .18s;font-family:var(--ff-body);
+}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#3a7aff;box-shadow:0 0 18px var(--glow)}
+.btn-ghost{background:var(--panel);border:1px solid var(--border);color:var(--muted)}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+
+.quiz-result{
+  padding:10px 14px;border-radius:10px;font-family:var(--ff-mono);
+  font-size:.85rem;display:none;background:var(--bg3);border:1px solid var(--border);
+}
+.quiz-result.show{display:block}
+
+/* ===================== FLASHCARDS ===================== */
+.fc-section{padding:28px 0}
+.fc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.fc-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.fc-grid{grid-template-columns:1fr}}
+
+.fc-card{
+  perspective:900px;height:160px;cursor:pointer;
+}
+.fc-inner{
+  position:relative;width:100%;height:100%;
+  transition:transform .5s cubic-bezier(.4,0,.2,1);
+  transform-style:preserve-3d;
+}
+.fc-card.flipped .fc-inner{transform:rotateY(180deg)}
+.fc-face{
+  position:absolute;inset:0;border-radius:var(--r);
+  border:1px solid var(--border);padding:16px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;backface-visibility:hidden;
+}
+.fc-front{background:linear-gradient(135deg,var(--bg2),var(--bg3))}
+.fc-back{
+  background:linear-gradient(135deg,rgba(79,142,255,.12),rgba(54,217,168,.08));
+  transform:rotateY(180deg);
+}
+.fc-term{font-family:var(--ff-head);font-size:1rem;font-weight:700;color:var(--text)}
+.fc-hint{font-size:.74rem;color:var(--dim);margin-top:6px;font-family:var(--ff-mono)}
+.fc-def{font-size:.83rem;color:var(--muted);line-height:1.55}
+.fc-tag{font-size:.72rem;color:var(--accent2);margin-bottom:6px;font-family:var(--ff-mono)}
+
+/* ===================== GRADE PANEL ===================== */
+.grade-panel{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);padding:24px;
+}
+.grade-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:16px}
+.grade-item{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--r2);padding:14px;display:flex;align-items:center;gap:12px;
+}
+.grade-dot{width:10px;height:10px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.grade-dot.done{background:var(--success)}
+.grade-dot.partial{background:var(--warn)}
+.grade-info{flex:1}
+.grade-ch{font-size:.82rem;font-weight:600;color:var(--text)}
+.grade-sc{font-family:var(--ff-mono);font-size:.78rem;color:var(--muted)}
+.letter-grade{
+  font-family:var(--ff-head);font-size:1.1rem;font-weight:800;
+}
+.grade-A{color:#22c55e}.grade-B{color:#84cc16}
+.grade-C{color:var(--warn)}.grade-D{color:#f97316}.grade-F{color:var(--danger)}
+.grade-none{color:var(--dim)}
+
+/* ===================== CALLOUT ===================== */
+.callout{
+  background:linear-gradient(135deg,rgba(79,142,255,.08),rgba(54,217,168,.05));
+  border:1px solid var(--border2);border-radius:var(--r);padding:20px 24px;
+  margin-bottom:20px;
+}
+.callout h3{font-family:var(--ff-head);margin-bottom:8px}
+.callout li{padding:3px 0 3px 14px;position:relative;color:var(--muted);font-size:.9rem}
+.callout li::before{content:'→';position:absolute;left:0;color:var(--accent2)}
+
+/* ===================== FOOTER ===================== */
+footer{padding:40px 0;text-align:center;color:var(--dim);font-size:.85rem;border-top:1px solid var(--border);margin-top:40px}
+
+/* ===================== SEARCH HIGHLIGHT ===================== */
+.chapter-card.hidden{display:none}
+.chapter-card.search-match .chapter-header{background:rgba(79,142,255,.06)}
+
+/* ===================== UTILS ===================== */
+.tag-foundation{color:var(--p1)}.tag-core{color:var(--p2)}.tag-advanced{color:var(--p3)}.tag-system{color:var(--p4)}
+.mono{font-family:var(--ff-mono)}
+.mt-2{margin-top:8px}
+.no-results{text-align:center;color:var(--dim);padding:40px;font-family:var(--ff-mono);display:none}
+
+/* Animation */
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.chapter-body{animation:fadeIn .22s ease}
+.chapter-card.open .chapter-body{display:block;animation:fadeIn .22s ease}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="wrap nav-inner">
+    <div class="brand">DS Study Hub</div>
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#chapters">Chapters</a>
+      <a href="#flashcards">Flashcards</a>
+      <a href="#grades">Grades</a>
+    </div>
+    <div class="nav-right">
+      <div class="search-wrap">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="search" placeholder="Search chapters…" autocomplete="off"/>
+      </div>
+      <button class="theme-btn" id="themeToggle" title="Toggle theme">☀️</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-card">
+      <div>
+        <span class="eyebrow">v2 · Interactive Study Hub</span>
+        <h1>Data Structures &amp; Algorithms in C++</h1>
+        <p class="hero-desc">14 chapters. Quizzes with explanations. Flashcards. Grade tracking. Expand/collapse cards. Dark &amp; light mode. Everything you need to actually study — not just read.</p>
+        <div class="pills">
+          <span class="pill">14 Chapters</span>
+          <span class="pill">70+ Quiz Questions</span>
+          <span class="pill">30 Flashcards</span>
+          <span class="pill">Live Grade Tracking</span>
+          <span class="pill">Expand / Collapse</span>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong id="stat-chapters">14</strong><span>chapters covered</span></div>
+        <div class="stat"><strong id="stat-quizzes">0</strong><span>quizzes completed</span></div>
+        <div class="stat"><strong id="stat-score">—</strong><span>overall accuracy</span></div>
+        <div class="stat"><strong id="stat-fc">30</strong><span>flashcards to study</span></div>
+      </div>
+    </div>
+
+    <div class="global-progress">
+      <span class="gp-label">Overall Progress</span>
+      <div class="gp-bar-wrap"><div class="gp-bar" id="gpBar"></div></div>
+      <span class="gp-score" id="gpScore">0 / 0 correct</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <h2 class="section-title">How to Use This Site</h2>
+    <p class="section-sub">Click any chapter card to expand it. Read the summary, tackle the quiz, and check your explanations. Your scores save automatically as you go.</p>
+    <div class="callout">
+      <h3>Recommended Study Loop</h3>
+      <ul>
+        <li>Open a chapter card — read the summary first</li>
+        <li>Take the quiz without peeking at notes</li>
+        <li>Read every explanation — right or wrong</li>
+        <li>Flip flashcards for key terminology</li>
+        <li>Return to chapters where your grade is below B</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section id="roadmap">
+    <h2 class="section-title">Beginner Roadmap</h2>
+    <p class="section-sub">Build foundations first. Jumping straight to graphs without knowing Big-O will hurt you.</p>
+    <div class="roadmap">
+      <div class="phase p1">
+        <h3>① Foundations</h3>
+        <ul>
+          <li>Ch 1 — C++ Primer</li>
+          <li>Ch 2 — OO Design</li>
+          <li>Learn the language & style</li>
+        </ul>
+      </div>
+      <div class="phase p2">
+        <h3>② Core Concepts</h3>
+        <ul>
+          <li>Ch 3 — Arrays, Linked Lists</li>
+          <li>Ch 4 — Analysis / Big-O</li>
+          <li>Understand storage & cost</li>
+        </ul>
+      </div>
+      <div class="phase p3">
+        <h3>③ Main Structures</h3>
+        <ul>
+          <li>Ch 5–10</li>
+          <li>Stacks, Trees, Heaps, Hashing</li>
+          <li>Build your toolkit</li>
+        </ul>
+      </div>
+      <div class="phase p4">
+        <h3>④ Algorithms & Systems</h3>
+        <ul>
+          <li>Ch 11–14</li>
+          <li>Sorting, DP, Graphs, Memory</li>
+          <li>Solve harder problems</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAPTERS -->
+  <section id="chapters">
+    <h2 class="section-title">Chapters</h2>
+    <p class="section-sub">Click a card to expand. Each includes a summary, key topics, and a quiz with instant feedback and explanations.</p>
+    <div class="no-results" id="noResults">No chapters match your search.</div>
+    <div class="chapters-grid" id="chaptersGrid"></div>
+  </section>
+
+  <!-- FLASHCARDS -->
+  <section id="flashcards" class="fc-section">
+    <h2 class="section-title">Flashcards</h2>
+    <p class="section-sub">Click a card to flip it. Front = term. Back = definition. Great for last-minute revision.</p>
+    <div class="fc-grid" id="fcGrid"></div>
+  </section>
+
+  <!-- GRADES -->
+  <section id="grades">
+    <h2 class="section-title">Your Grades</h2>
+    <p class="section-sub">Complete quizzes to see your grades per chapter. Aim for all A's!</p>
+    <div class="grade-panel">
+      <div class="grade-grid" id="gradeGrid"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>DS Study Hub v2 — Data Structures &amp; Algorithms in C++ · Built for exam revision</p>
+  </div>
+</footer>
+
+<script>
+/* ==================== DATA ==================== */
+const CHAPTERS = [
+  {
+    id:1, phase:"Foundation", tag:"Ch 1",
+    title:"A C++ Primer",
+    desc:"The programming language base you need before studying data structures. Covers variables, types, pointers, memory management, and class basics essential for understanding all later implementations.",
+    topics:["Variables, types, and control flow","Pointers and references","Memory: stack vs heap","Functions and parameter passing","Intro to classes and objects"],
+    quiz:[
+      {q:"What is the key difference between a pointer and a reference in C++?",opts:["A pointer can be reassigned; a reference always refers to its original object","References use more memory than pointers","Pointers cannot store addresses of objects","References can be NULL"],ans:0,exp:"A pointer stores an address and can be reassigned to point elsewhere (or set to nullptr). A reference is an alias — once bound, it cannot be rebound and cannot be null."},
+      {q:"What does the 'new' keyword do in C++?",opts:["Declares a new variable on the stack","Allocates memory on the heap and returns a pointer","Copies an existing object","Deletes old memory"],ans:1,exp:"'new' dynamically allocates memory on the heap and returns a pointer to it. You are responsible for freeing this with 'delete' to avoid memory leaks."},
+      {q:"What is a 'destructor' in a C++ class?",opts:["A function that creates an object","A special member called automatically when an object goes out of scope","A function that copies an object","An overloaded operator"],ans:1,exp:"A destructor (~ClassName()) is called automatically when an object's lifetime ends. It's used to release resources like heap memory allocated in the constructor."},
+      {q:"What is the output of: int x = 5; int* p = &x; *p = 10; cout << x;",opts:["5","10","Address of x","Undefined"],ans:1,exp:"p holds the address of x. Dereferencing with *p = 10 changes the value at that address. So x becomes 10."},
+      {q:"Which statement about stack memory is correct?",opts:["Heap memory is faster than stack","Stack memory is automatically managed and freed when a function returns","Stack can grow indefinitely","Stack memory requires 'delete' to free"],ans:1,exp:"Stack memory is automatically allocated when a function is called and freed when it returns. No manual management needed — contrast with heap memory which requires 'new'/'delete'."}
+    ]
+  },
+  {
+    id:2, phase:"Foundation", tag:"Ch 2",
+    title:"Object-Oriented Design",
+    desc:"How to organize code using abstraction, inheritance, polymorphism, and templates. Teaches you to write code that is reusable, well-designed, and expresses intent through clear interfaces.",
+    topics:["Abstraction and encapsulation","Inheritance hierarchies","Polymorphism and virtual functions","Abstract classes and interfaces","C++ templates for genericity"],
+    quiz:[
+      {q:"What is polymorphism in OOP?",opts:["The ability to use the same interface for different data types","Creating multiple copies of a class","Hiding implementation details","Passing objects by value"],ans:0,exp:"Polymorphism means 'many forms'. In C++ this lets a base class pointer call overridden methods in derived classes. It makes code extensible without modification."},
+      {q:"What makes a C++ class 'abstract'?",opts:["It has no constructor","It contains at least one pure virtual function","It inherits from two classes","It uses templates"],ans:1,exp:"A class is abstract if it declares at least one pure virtual function (= 0). You cannot instantiate it directly — derived classes must override the pure virtual methods."},
+      {q:"What does a template do in C++?",opts:["Creates a copy of a class","Allows a class or function to work with any data type","Prevents inheritance","Manages memory automatically"],ans:1,exp:"Templates enable generic programming. You write the logic once and the compiler generates type-specific versions. The STL containers (vector, list, etc.) all use templates."},
+      {q:"Which OOP principle says 'hide implementation details'?",opts:["Inheritance","Polymorphism","Encapsulation","Composition"],ans:2,exp:"Encapsulation bundles data and methods together and hides internal state. Users interact through a public interface, reducing coupling and the risk of misuse."},
+      {q:"What is the purpose of the 'virtual' keyword on a function?",opts:["Speeds up the function","Enables dynamic dispatch — the correct override is called at runtime","Makes the function abstract","Prevents overriding"],ans:1,exp:"'virtual' enables runtime polymorphism. Without it, C++ uses static binding (compile-time). With it, the most-derived override is called based on the actual object type."}
+    ]
+  },
+  {
+    id:3, phase:"Core", tag:"Ch 3",
+    title:"Arrays, Linked Lists, and Recursion",
+    desc:"Your first major concrete data structures plus the concept of recursion. Compare contiguous versus linked storage and practice thinking recursively by reducing problems to smaller subproblems.",
+    topics:["Static vs dynamic arrays","Singly and doubly linked lists","Node-based storage and pointers","Recursion and base cases","Comparing sequential access patterns"],
+    quiz:[
+      {q:"What is the time complexity for random access in an array?",opts:["O(n)","O(log n)","O(1)","O(n²)"],ans:2,exp:"Arrays store elements contiguously. Given an index, the CPU computes base_address + index * element_size in constant time — O(1) — regardless of array size."},
+      {q:"What is the time complexity of inserting at the front of a singly linked list?",opts:["O(n)","O(1)","O(log n)","O(n²)"],ans:1,exp:"Inserting at the front only requires updating the head pointer — one operation, O(1). No shifting needed, unlike arrays."},
+      {q:"What is the base case in a recursive function?",opts:["The case that causes infinite recursion","The condition where the function stops calling itself","The starting memory address","The most complex input"],ans:1,exp:"Every recursive function must have a base case — the condition that stops recursion. Without it you get a stack overflow. Example: factorial(0) = 1."},
+      {q:"Which is an advantage of linked lists over arrays?",opts:["Faster random access","Better cache performance","Dynamic size and O(1) insertion at known positions","Less memory used"],ans:2,exp:"Linked lists can grow/shrink dynamically without reallocation. Insertion/deletion at a known node is O(1). Arrays need O(n) shifting for middle insertions."},
+      {q:"In a doubly linked list, each node contains:",opts:["Only a next pointer","Data and a next pointer only","Data, a next pointer, and a previous pointer","Two data fields"],ans:2,exp:"A doubly linked list node has three parts: the data, a pointer to the next node, and a pointer to the previous node. This enables traversal in both directions."}
+    ]
+  },
+  {
+    id:4, phase:"Core", tag:"Ch 4",
+    title:"Analysis Tools",
+    desc:"How to measure and compare algorithm efficiency. Big-O notation lets you predict how an algorithm's runtime or space usage scales with input size, separating good solutions from impractical ones.",
+    topics:["Big-O, Big-Omega, Big-Theta","Growth rate families: O(1) to O(n!)","Worst, average, and best case","Analyzing loops and recursion","Comparing algorithm choices"],
+    quiz:[
+      {q:"What does O(n log n) mean?",opts:["Linear time","Quadratic time","Time grows as n multiplied by log n","Constant time"],ans:2,exp:"O(n log n) means the algorithm performs roughly n log n operations. Most efficient comparison-based sorting algorithms (merge sort, heap sort) run in O(n log n)."},
+      {q:"Which grows fastest for large n?",opts:["O(n)","O(n²)","O(2ⁿ)","O(n log n)"],ans:2,exp:"Exponential growth O(2ⁿ) dominates all polynomial functions for large n. This is why exponential-time algorithms are generally impractical for large inputs."},
+      {q:"If an algorithm is O(1), what does that mean?",opts:["It takes 1 second","Its runtime does not depend on input size","It uses 1 byte of memory","It runs once per element"],ans:1,exp:"O(1) means constant time — the operation takes the same amount of time regardless of how large the input is. Array indexing and hash table lookups (average) are O(1)."},
+      {q:"What does Big-O notation describe?",opts:["Exact runtime in seconds","Lower bound on runtime","Upper bound on runtime growth","Memory usage only"],ans:2,exp:"Big-O describes an upper bound on growth rate. It tells you: in the worst case, this algorithm will not grow faster than f(n). It intentionally ignores constants and lower-order terms."},
+      {q:"A nested loop that both iterate 0..n has what complexity?",opts:["O(n)","O(n log n)","O(n²)","O(2n)"],ans:2,exp:"Each loop runs n times. The inner loop runs n times for each iteration of the outer loop — giving n × n = n² operations total. Classic O(n²)."}
+    ]
+  },
+  {
+    id:5, phase:"Advanced", tag:"Ch 5",
+    title:"Stacks, Queues, and Deques",
+    desc:"Restricted-access structures where insertion and deletion follow specific ordering rules. Simple but foundational — stacks power function calls and undo operations; queues power scheduling and BFS.",
+    topics:["Stack: LIFO access, push/pop","Queue: FIFO access, enqueue/dequeue","Deque: operations at both ends","Array vs linked-list implementations","Real-world applications of each"],
+    quiz:[
+      {q:"What ordering principle does a stack follow?",opts:["FIFO — first in, first out","LIFO — last in, first out","Random access","Priority-based"],ans:1,exp:"A stack is LIFO: the last item pushed is the first popped. Think of a stack of plates. The call stack in your program uses this exact structure."},
+      {q:"Which data structure would you use to implement a breadth-first search?",opts:["Stack","Queue","Array","Priority Queue"],ans:1,exp:"BFS explores neighbors level-by-level. A queue ensures nodes are visited in the order they were discovered — FIFO perfectly models this level-by-level expansion."},
+      {q:"What is the time complexity of push and pop on a stack implemented with a linked list?",opts:["O(n)","O(log n)","O(1)","O(n²)"],ans:2,exp:"With a linked-list stack, push adds to the front (O(1)) and pop removes from the front (O(1)). No traversal needed."},
+      {q:"A deque (double-ended queue) supports:",opts:["Insert/remove at front only","Insert/remove at back only","Insert/remove at both front and back","Random access by index"],ans:2,exp:"A deque (pronounced 'deck') allows push/pop at both the front and back efficiently. It generalizes both stacks and queues."},
+      {q:"Which real application directly uses a stack?",opts:["Print job scheduling","Function call management (call stack)","CPU task scheduling","Network packet routing"],ans:1,exp:"Every function call in a program pushes a stack frame (local vars, return address) onto the call stack. When the function returns, that frame is popped. It's literally a stack."}
+    ]
+  },
+  {
+    id:6, phase:"Advanced", tag:"Ch 6",
+    title:"List and Iterator ADTs",
+    desc:"Abstract data types for sequential collections and ways to traverse them uniformly. Iterators let you walk through any container without knowing its internal structure.",
+    topics:["Abstract Data Type concept","List ADT operations","Iterator pattern and design","Separating interface from implementation","Practical use in the C++ STL"],
+    quiz:[
+      {q:"What is an Abstract Data Type (ADT)?",opts:["A data type with no operations","A data type defined by its behavior (interface), not implementation","A type that can only store integers","A C++ template class"],ans:1,exp:"An ADT specifies what operations can be performed and their semantics, without specifying how they are implemented. This lets you swap implementations without changing client code."},
+      {q:"What is the purpose of an iterator?",opts:["To sort a collection","To provide a uniform way to traverse elements of a container","To copy a collection","To delete elements efficiently"],ans:1,exp:"An iterator abstracts traversal. Whether the underlying container is an array, linked list, or tree, the iterator provides a consistent interface: advance, dereference, compare."},
+      {q:"In the STL, what does std::list provide?",opts:["An array-based list","A doubly linked list","A sorted set","A hash table"],ans:1,exp:"std::list is implemented as a doubly linked list. It provides O(1) insertions/deletions at known positions and bidirectional iterators, but O(n) random access."},
+      {q:"Why is separating interface from implementation valuable?",opts:["It makes code slower","You can change the implementation without breaking client code","It requires more memory","It prevents inheritance"],ans:1,exp:"If client code depends only on the interface (ADT), you can optimize or completely replace the implementation without touching the clients. This is a core principle of maintainable software."},
+      {q:"Which iterator operation advances to the next element?",opts:["*it (dereference)","++it (increment)","it-- (decrement)","it[n] (subscript)"],ans:1,exp:"++it advances the iterator to the next element. *it dereferences to get the current value. Combining these, you can traverse any STL container uniformly."}
+    ]
+  },
+  {
+    id:7, phase:"Advanced", tag:"Ch 7",
+    title:"Trees",
+    desc:"Hierarchical structures that model parent-child relationships. Trees underpin file systems, HTML, compilers, and more. Understanding trees is essential before studying search trees, heaps, or graphs.",
+    topics:["Tree terminology: root, leaf, height, depth","Binary trees and their properties","Inorder, preorder, postorder traversal","Expression trees","When to use trees vs linear structures"],
+    quiz:[
+      {q:"What is the height of a tree?",opts:["Number of nodes","Length of the longest path from root to a leaf","Number of leaves","Depth of the root"],ans:1,exp:"Height measures the longest root-to-leaf path. A tree with a single node has height 0. Height determines the worst-case performance of many tree operations."},
+      {q:"In inorder traversal of a BST, nodes are visited:",opts:["Root, Left, Right","Left, Root, Right (sorted ascending)","Left, Right, Root","Right, Root, Left"],ans:1,exp:"Inorder (Left → Root → Right) visits BST nodes in sorted ascending order. This is why it's used to produce sorted output from a BST."},
+      {q:"What is a leaf node?",opts:["The root of the tree","A node with no children","A node with exactly two children","A node at depth 1"],ans:1,exp:"A leaf node has no children. It's the end of a branch. In a binary tree, a leaf has left = null and right = null."},
+      {q:"What is a complete binary tree?",opts:["Every node has exactly 2 children","All levels are fully filled except possibly the last, which fills left to right","A tree where all leaves are at the same depth","A tree with no duplicate values"],ans:1,exp:"A complete binary tree fills levels left-to-right. The last level may be incomplete but leftmost positions are filled. This property enables array representation of heaps."},
+      {q:"Preorder traversal visits nodes in which order?",opts:["Left, Root, Right","Right, Root, Left","Root, Left, Right","Left, Right, Root"],ans:2,exp:"Preorder: visit the Root first, then recursively the Left subtree, then the Right subtree. Useful for copying a tree or generating prefix expressions."}
+    ]
+  },
+  {
+    id:8, phase:"Advanced", tag:"Ch 8",
+    title:"Heaps and Priority Queues",
+    desc:"Structures for managing items by priority rather than insertion order. Heaps give O(log n) insertion and O(log n) removal of the maximum (or minimum) element — ideal for task schedulers and graph algorithms.",
+    topics:["Priority Queue ADT","Heap property (max-heap / min-heap)","Heap as a complete binary tree in array","Insert (sift-up) and remove (sift-down)","Heap sort overview"],
+    quiz:[
+      {q:"In a max-heap, what property must hold for every node?",opts:["Each node is smaller than its parent","Each node is larger than its children","All leaves have the same value","The tree is sorted left to right"],ans:1,exp:"Max-heap property: every node's value ≥ its children's values. This guarantees the maximum is always at the root, giving O(1) access to the max and O(log n) removal."},
+      {q:"What is the time complexity of inserting into a binary heap?",opts:["O(1)","O(n)","O(log n)","O(n log n)"],ans:2,exp:"Insertion adds the element at the end (O(1)) then 'sifts up' to restore heap property. Sifting traverses at most one root-to-leaf path: O(log n)."},
+      {q:"Why is a heap stored as an array rather than explicit nodes?",opts:["Arrays are always faster","Array representation uses parent/child index math, saving pointer memory","Arrays support O(1) search","Heaps must be sorted"],ans:1,exp:"For a node at index i, left child = 2i+1, right child = 2i+2, parent = (i-1)/2. No pointer fields needed — this arithmetic is O(1) and cache-friendly."},
+      {q:"What operation does 'heapify' perform?",opts:["Sorts the array","Converts an arbitrary array into a valid heap in O(n)","Deletes the minimum element","Inserts a new element"],ans:1,exp:"Heapify (build-heap) rearranges an unsorted array into a valid heap in O(n) time by sifting down from the last internal node upward. Used as the first step in heapsort."},
+      {q:"A priority queue using a binary heap gives what complexity for 'extract-max'?",opts:["O(1)","O(n)","O(log n)","O(n log n)"],ans:2,exp:"Extract-max removes the root, swaps it with the last element, reduces size by 1, then sifts down the new root: O(log n). Accessing the max without removal is O(1)."}
+    ]
+  },
+  {
+    id:9, phase:"Advanced", tag:"Ch 9",
+    title:"Hash Tables, Maps, and Skip Lists",
+    desc:"Fast retrieval using keys. Hash tables give average O(1) search, insertion, and deletion. Skip lists offer probabilistic O(log n) operations with simpler implementation than balanced trees.",
+    topics:["Hash functions and properties","Collision resolution: chaining vs open addressing","Load factor and rehashing","Map ADT (key → value)","Skip list structure and expected complexity"],
+    quiz:[
+      {q:"What is the average-case time complexity of search in a hash table?",opts:["O(n)","O(log n)","O(1)","O(n²)"],ans:2,exp:"A good hash function distributes keys uniformly. With a low load factor, most buckets have 0–1 element, giving O(1) average lookup. Worst case (all collisions) degrades to O(n)."},
+      {q:"What is a collision in a hash table?",opts:["When two keys map to the same index","When the table runs out of memory","When a key cannot be found","When two values are equal"],ans:0,exp:"A collision occurs when two different keys produce the same hash index. Collision resolution strategies include chaining (linked list per bucket) and open addressing (probing)."},
+      {q:"What is the load factor of a hash table?",opts:["Number of collisions","n / capacity (elements stored / total slots)","The hash function's output range","Maximum chain length"],ans:1,exp:"Load factor λ = n/m where n = elements stored, m = array size. As λ approaches 1, collisions increase. Typically rehashing occurs when λ > 0.75."},
+      {q:"Which collision resolution uses a linked list at each slot?",opts:["Linear probing","Quadratic probing","Separate chaining","Double hashing"],ans:2,exp:"Separate chaining stores colliding elements in a linked list (or other structure) at each array slot. Simple to implement; performance degrades gracefully with high load."},
+      {q:"What is the expected search complexity of a skip list?",opts:["O(1)","O(log n)","O(n)","O(n log n)"],ans:1,exp:"Skip lists use layered express lanes with randomized promotion. Expected search time is O(log n) — matching balanced BSTs — but implementation is simpler and lock-friendly."}
+    ]
+  },
+  {
+    id:10, phase:"Advanced", tag:"Ch 10",
+    title:"Search Trees",
+    desc:"Ordered trees that support efficient search, insertion, and deletion. Balance matters enormously — a degenerate (unbalanced) BST degrades to O(n) operations, motivating self-balancing variants.",
+    topics:["Binary Search Tree (BST) invariant","BST search, insert, delete","Tree balance and worst-case scenarios","AVL trees and rotations","Splay trees and amortized analysis"],
+    quiz:[
+      {q:"What is the BST invariant?",opts:["Left child > parent, right child < parent","Left child < parent, right child > parent (all subtree values)","All nodes are equal","The tree must be complete"],ans:1,exp:"BST invariant: for every node, all values in its left subtree are less, all in its right subtree are greater. This enables O(h) search where h is height."},
+      {q:"What is the worst-case height of an unbalanced BST with n nodes?",opts:["O(log n)","O(√n)","O(n)","O(n log n)"],ans:2,exp:"Inserting sorted data into a BST creates a linear chain (essentially a linked list) of height n. All operations degrade to O(n). This motivates self-balancing trees."},
+      {q:"What do AVL tree rotations accomplish?",opts:["Sort the tree","Restore the height-balance property after insert/delete","Delete the minimum node","Build the tree from an array"],ans:1,exp:"AVL rotations (single and double) restore the balance condition (|height(left) - height(right)| ≤ 1) after an insertion or deletion disturbs it. This guarantees O(log n) operations."},
+      {q:"What is the time complexity of search in a balanced BST?",opts:["O(n)","O(n²)","O(log n)","O(1)"],ans:2,exp:"In a balanced BST of height O(log n), each comparison eliminates half the remaining nodes, giving O(log n) search — similar to binary search on a sorted array."},
+      {q:"What distinguishes a splay tree from an AVL tree?",opts:["Splay trees are always perfectly balanced","Splay trees move recently accessed nodes to the root; AVL trees maintain strict balance","Splay trees use less memory","AVL trees are faster for all operations"],ans:1,exp:"Splay trees use splaying (a sequence of rotations) to move accessed nodes to the root. No balance info is stored. They offer O(log n) amortized but worse worst-case than AVL."}
+    ]
+  },
+  {
+    id:11, phase:"Algorithms", tag:"Ch 11",
+    title:"Sorting, Sets, and Selection",
+    desc:"Arranging data and working with unique collections. Sorting is central to algorithms — ordered data enables binary search, merge operations, and efficient database queries.",
+    topics:["Comparison sorts: merge, quick, heap sort","Non-comparison sorts: counting, radix","Lower bound Ω(n log n) for comparison sorting","Set ADT and union-find","Selection: finding kth smallest in O(n)"],
+    quiz:[
+      {q:"What is the time complexity of merge sort?",opts:["O(n)","O(n log n)","O(n²)","O(log n)"],ans:1,exp:"Merge sort divides the array in half (log n levels), merges in O(n) per level → O(n log n). It's stable and its performance is guaranteed — unlike quicksort's worst case."},
+      {q:"What is quicksort's average-case complexity?",opts:["O(n)","O(n²)","O(n log n)","O(log n)"],ans:2,exp:"Quicksort averages O(n log n) with a good pivot strategy. The worst case (sorted input, bad pivot) is O(n²), but randomized pivot makes this extremely unlikely."},
+      {q:"What is the theoretical lower bound for comparison-based sorting?",opts:["O(n)","O(n log n)","O(n²)","O(log n)"],ans:1,exp:"Any comparison-based sort must make at least Ω(n log n) comparisons in the worst case. This is proven via decision tree analysis. Merge sort and heap sort achieve this."},
+      {q:"Which sorting algorithm is stable?",opts:["Heap sort","Quick sort (in-place)","Merge sort","Selection sort"],ans:2,exp:"A stable sort preserves the relative order of equal elements. Merge sort is stable. Heap sort and in-place quicksort are generally not stable."},
+      {q:"Counting sort runs in O(n + k) time. What is k?",opts:["Number of comparisons","The range of input values","log n","Number of passes"],ans:1,exp:"Counting sort counts occurrences of each value (0 to k-1). It's O(n + k). When k = O(n), it's linear — beating the comparison sort lower bound by avoiding comparisons entirely."}
+    ]
+  },
+  {
+    id:12, phase:"Algorithms", tag:"Ch 12",
+    title:"Strings and Dynamic Programming",
+    desc:"Text-oriented algorithms and the powerful technique of dynamic programming. DP solves optimization problems by breaking them into overlapping subproblems, solving each once, and combining results.",
+    topics:["String matching: brute force vs KMP","Longest common subsequence (LCS)","Edit distance (Levenshtein)","0/1 knapsack problem","Memoization vs tabulation"],
+    quiz:[
+      {q:"What is the core idea of dynamic programming?",opts:["Divide the problem into independent subproblems","Solve each subproblem once and store its result for reuse","Always use recursion","Optimize with sorting first"],ans:1,exp:"DP avoids redundant computation by solving overlapping subproblems once and caching results (memoization) or building bottom-up (tabulation). The two conditions: optimal substructure + overlapping subproblems."},
+      {q:"What does the edit distance between two strings measure?",opts:["Number of matching characters","Minimum operations (insert/delete/replace) to transform one string to another","Length difference","Number of common substrings"],ans:1,exp:"Edit distance (Levenshtein distance) is the minimum number of single-character edits to turn one string into another. It's computed with a classic DP table in O(mn) time."},
+      {q:"What is memoization?",opts:["Storing sorted results","Caching results of function calls to avoid recomputation","A string compression technique","Sorting a DP table"],ans:1,exp:"Memoization is top-down DP: you write the recursion naturally but add a cache. Before computing, check if the result is already stored. If yes, return it immediately."},
+      {q:"LCS stands for:",opts:["Longest Contiguous Subsequence","Longest Common Substring","Longest Common Subsequence","Least Common Subsequence"],ans:2,exp:"LCS finds the longest subsequence present in both strings (not necessarily contiguous). Key DP problem with O(mn) time/space — foundational for diff tools and bioinformatics."},
+      {q:"The KMP string search algorithm improves on brute force by:",opts:["Sorting the pattern first","Never re-examining characters already matched using a failure function","Using hashing","Trying all positions in parallel"],ans:1,exp:"KMP preprocesses the pattern to build a failure function that tells you how much to shift without losing progress when a mismatch occurs. Result: O(n + m) vs O(nm) brute force."}
+    ]
+  },
+  {
+    id:13, phase:"Algorithms", tag:"Ch 13",
+    title:"Graph Algorithms",
+    desc:"Graphs model networks of any kind — maps, social networks, dependencies, web links. Graph algorithms solve path-finding, connectivity, and optimization problems across all these domains.",
+    topics:["Graph representation: adjacency list vs matrix","BFS and DFS traversal","Dijkstra's shortest path (weighted)","Minimum spanning trees: Prim's and Kruskal's","Topological sort (DAGs)"],
+    quiz:[
+      {q:"What is the difference between BFS and DFS?",opts:["BFS uses a stack, DFS uses a queue","BFS uses a queue (level-by-level), DFS uses a stack (depth-first)","BFS is always faster","DFS cannot find shortest paths in any case"],ans:1,exp:"BFS (queue) explores neighbors level by level — finds shortest path in unweighted graphs. DFS (stack/recursion) plunges deep first — useful for cycle detection, topological sort, connected components."},
+      {q:"What does Dijkstra's algorithm compute?",opts:["Minimum spanning tree","Single-source shortest paths in a weighted graph (non-negative edges)","All-pairs shortest paths","Longest path"],ans:1,exp:"Dijkstra's finds the shortest path from a source to all other vertices. It uses a priority queue (min-heap) to greedily process vertices. Requires non-negative edge weights."},
+      {q:"What is a minimum spanning tree (MST)?",opts:["The shortest path between two nodes","A subgraph that connects all vertices with minimum total edge weight and no cycles","A tree with the minimum number of nodes","The deepest tree in the graph"],ans:1,exp:"An MST spans all vertices of a connected weighted graph with the minimum possible total edge weight, containing exactly n-1 edges and no cycles. Prim's and Kruskal's both find MSTs."},
+      {q:"Adjacency lists are preferred over adjacency matrices when:",opts:["The graph is dense","The graph is sparse (few edges)","You need O(1) edge lookup","The graph has no self-loops"],ans:1,exp:"Adjacency lists use O(V + E) space — efficient for sparse graphs. Adjacency matrices use O(V²) space — efficient for dense graphs and O(1) edge existence checks."},
+      {q:"Topological sort is only possible on which type of graph?",opts:["Undirected graphs","Graphs with cycles","Directed Acyclic Graphs (DAGs)","Complete graphs"],ans:2,exp:"Topological sort linearly orders vertices so every directed edge goes from earlier to later. This is only possible in a DAG (no cycles). Used for dependency resolution, build systems, course prerequisites."}
+    ]
+  },
+  {
+    id:14, phase:"System", tag:"Ch 14",
+    title:"Memory Management and B-Trees",
+    desc:"How data structures interact with physical memory and external storage. B-trees are specifically designed for disk access patterns where data is too large to fit in RAM, used in every major database and filesystem.",
+    topics:["Stack vs heap vs external storage","Memory allocation strategies","Why disk access patterns differ from RAM","B-tree structure and properties","B-tree search, insert, split operations"],
+    quiz:[
+      {q:"Why are B-trees preferred for database indexes over binary trees?",opts:["B-trees are always sorted","B-trees have high branching factor, minimizing disk reads","B-trees use less RAM","Binary trees don't support deletion"],ans:1,exp:"Disk I/O is the bottleneck for large datasets. B-trees have large branching factors (hundreds), keeping tree height very small (2–4 levels). Each level = one disk read, so fewer reads per search."},
+      {q:"What is the minimum degree t of a B-tree?",opts:["Maximum number of keys per node","A parameter where every non-root node has at least t-1 keys and at most 2t-1 keys","The tree's height","Number of leaf nodes"],ans:1,exp:"Minimum degree t defines node capacity bounds. Non-root nodes: t-1 to 2t-1 keys (and t to 2t children). This balance ensures the tree stays shallow and disk accesses stay minimal."},
+      {q:"What triggers a 'split' operation in a B-tree?",opts:["Searching for a missing key","A node becomes full (has 2t-1 keys) during insertion","Deleting the root","Finding a duplicate key"],ans:1,exp:"When a node reaches its maximum capacity (2t-1 keys), it splits into two nodes and promotes the median key to the parent. This keeps the tree balanced and nodes within capacity bounds."},
+      {q:"What is external fragmentation in memory management?",opts:["Memory wasted inside allocated blocks","Free memory exists but is split into pieces too small to satisfy a request","Memory allocated but not used","Swapping memory to disk"],ans:1,exp:"External fragmentation: free memory is scattered across many small gaps between allocated blocks. Even if total free memory is sufficient, no single contiguous block is large enough for the request."},
+      {q:"In a B-tree of height h with minimum degree t, the maximum number of keys is:",opts:["2t·h","(2t)^(h+1) - 1","h · t","2h · t"],ans:1,exp:"A full B-tree of height h has (2t)^(h+1) - 1 keys. Since h stays very small (log base t of n), this gives enormous capacity with minimal height — perfect for external storage."}
+    ]
+  }
+];
+
+const FLASHCARDS = [
+  {term:"Big-O Notation",def:"An upper bound on algorithm growth rate as input size n increases. Ignores constants and lower-order terms.",tag:"Analysis"},
+  {term:"Pointer",def:"A variable that stores the memory address of another variable. In C++, declared with *.",tag:"C++ Basics"},
+  {term:"Recursion",def:"A function that calls itself with a smaller subproblem. Must have a base case to terminate.",tag:"Fundamentals"},
+  {term:"Stack (ADT)",def:"LIFO structure. Last element pushed is first popped. Push/pop are O(1).",tag:"Linear Structures"},
+  {term:"Queue (ADT)",def:"FIFO structure. First element enqueued is first dequeued. Enqueue/dequeue are O(1).",tag:"Linear Structures"},
+  {term:"Binary Search Tree",def:"A tree where left subtree has smaller keys, right subtree has larger keys than each node.",tag:"Trees"},
+  {term:"Max-Heap Property",def:"Every node's value ≥ its children. The maximum is always at the root. Enables O(log n) extract-max.",tag:"Heaps"},
+  {term:"Hash Collision",def:"Two different keys produce the same hash index. Resolved by chaining or open addressing.",tag:"Hashing"},
+  {term:"Amortized Analysis",def:"Average cost per operation over a sequence. Some expensive ops are 'paid for' by many cheap ones.",tag:"Analysis"},
+  {term:"AVL Tree",def:"Self-balancing BST. Height difference between left and right subtrees ≤ 1. Guarantees O(log n).",tag:"Search Trees"},
+  {term:"Merge Sort",def:"Divide-and-conquer sort. Recursively sorts halves then merges. O(n log n) stable sort.",tag:"Sorting"},
+  {term:"Dynamic Programming",def:"Solve overlapping subproblems once, store results. Two forms: memoization (top-down) and tabulation (bottom-up).",tag:"Algorithms"},
+  {term:"Graph (Directed)",def:"Vertices connected by directed edges. Edge (u,v) ≠ edge (v,u). Models one-way relationships.",tag:"Graphs"},
+  {term:"BFS",def:"Breadth-First Search. Uses a queue. Visits all level-k nodes before level-(k+1). Finds shortest path in unweighted graphs.",tag:"Graphs"},
+  {term:"DFS",def:"Depth-First Search. Uses a stack (or recursion). Explores as far as possible before backtracking.",tag:"Graphs"},
+  {term:"Load Factor",def:"λ = n/m. Ratio of elements to hash table size. High load factor → more collisions.",tag:"Hashing"},
+  {term:"Polymorphism",def:"Same interface, different implementations. Virtual functions enable runtime dispatch to the correct override.",tag:"OOP"},
+  {term:"Abstract Class",def:"A class with ≥1 pure virtual function. Cannot be instantiated. Defines an interface for subclasses.",tag:"OOP"},
+  {term:"Heap (memory)",def:"Region for dynamic allocation. Managed with new/delete. Slower than stack but persists beyond function scope.",tag:"Memory"},
+  {term:"B-Tree",def:"Balanced tree with high branching factor. Designed for disk storage. Minimizes disk reads by keeping height small.",tag:"Memory"},
+  {term:"Topological Sort",def:"Linear ordering of DAG vertices so every edge goes from earlier to later. Used for dependency resolution.",tag:"Graphs"},
+  {term:"Splay Tree",def:"BST that moves recently accessed nodes to root. O(log n) amortized. No balance info stored.",tag:"Search Trees"},
+  {term:"Dijkstra's Algorithm",def:"Finds shortest paths from source in weighted graph (non-negative edges). Uses min-priority queue. O((V+E) log V).",tag:"Graphs"},
+  {term:"Linked List",def:"Nodes connected by pointers. O(1) insert at head. O(n) random access. Dynamic size.",tag:"Linear Structures"},
+  {term:"Iterator",def:"Object that provides uniform traversal of a container. Supports ++, *, and != operations.",tag:"OOP"},
+  {term:"Encapsulation",def:"Bundling data and methods. Hiding internal state behind a public interface to reduce coupling.",tag:"OOP"},
+  {term:"Complete Binary Tree",def:"All levels full except possibly the last, which fills left-to-right. Enables array-based heap representation.",tag:"Trees"},
+  {term:"Counting Sort",def:"Non-comparison sort. Counts occurrences of each value. O(n+k) time. Only works on bounded integer keys.",tag:"Sorting"},
+  {term:"Edit Distance",def:"Minimum single-char edits (insert/delete/replace) to transform one string to another. Computed by DP in O(mn).",tag:"Algorithms"},
+  {term:"MST",def:"Minimum Spanning Tree. Connects all graph vertices with minimum total edge weight. No cycles. Prim's/Kruskal's find it.",tag:"Graphs"}
+];
+
+/* ==================== STATE ==================== */
+const scores = {}; // chapterId -> {correct, total}
+
+function getScore(id) { return scores[id] || null; }
+function setScore(id, correct, total) {
+  scores[id] = {correct, total};
+  updateStats();
+  updateGrades();
+}
+
+function letterGrade(pct) {
+  if(pct >= 90) return 'A';
+  if(pct >= 80) return 'B';
+  if(pct >= 70) return 'C';
+  if(pct >= 60) return 'D';
+  return 'F';
+}
+
+function updateStats() {
+  let completed = 0, totalCorrect = 0, totalQ = 0;
+  CHAPTERS.forEach(ch => {
+    const s = getScore(ch.id);
+    if(s) { completed++; totalCorrect += s.correct; totalQ += s.total; }
+  });
+  document.getElementById('stat-quizzes').textContent = completed;
+  document.getElementById('stat-score').textContent = totalQ > 0 ? Math.round(totalCorrect/totalQ*100)+'%' : '—';
+
+  // progress bar
+  const allQ = CHAPTERS.reduce((a,c) => a + c.quiz.length, 0);
+  const pct = allQ > 0 ? totalCorrect / allQ * 100 : 0;
+  document.getElementById('gpBar').style.width = pct+'%';
+  document.getElementById('gpScore').textContent = totalCorrect + ' / ' + allQ + ' correct';
+}
+
+function updateGrades() {
+  const grid = document.getElementById('gradeGrid');
+  grid.innerHTML = '';
+  CHAPTERS.forEach(ch => {
+    const s = getScore(ch.id);
+    const pct = s ? Math.round(s.correct / s.total * 100) : null;
+    const grade = pct !== null ? letterGrade(pct) : null;
+    const div = document.createElement('div');
+    div.className = 'grade-item';
+    const dotClass = pct === null ? '' : pct >= 70 ? 'done' : 'partial';
+    div.innerHTML = `
+      <div class="grade-dot ${dotClass}"></div>
+      <div class="grade-info">
+        <div class="grade-ch">${ch.tag} — ${ch.title}</div>
+        <div class="grade-sc mono">${s ? s.correct+'/'+s.total+' ('+pct+'%)' : 'Not attempted'}</div>
+      </div>
+      <div class="letter-grade grade-${grade || 'none'}">${grade || '—'}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+/* ==================== BUILD CHAPTERS ==================== */
+function buildChapters() {
+  const grid = document.getElementById('chaptersGrid');
+  CHAPTERS.forEach(ch => {
+    const card = document.createElement('div');
+    card.className = 'chapter-card';
+    card.dataset.id = ch.id;
+    card.dataset.title = ch.title.toLowerCase();
+
+    card.innerHTML = `
+      <div class="chapter-header" onclick="toggleCard(${ch.id})">
+        <span class="ch-num mono">${ch.tag}</span>
+        <span class="ch-title">${ch.title}</span>
+        <div class="ch-badge-group">
+          <span class="badge tag-${ch.phase.toLowerCase()}">${ch.phase}</span>
+          <span class="ch-score-chip" id="chip-${ch.id}">Not attempted</span>
+        </div>
+        <span class="ch-arrow">▾</span>
+      </div>
+      <div class="chapter-body">
+        <p class="ch-desc">${ch.desc}</p>
+        <ul class="ch-topics">
+          ${ch.topics.map(t=>`<li>${t}</li>`).join('')}
+        </ul>
+        ${buildQuiz(ch)}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function toggleCard(id) {
+  const card = document.querySelector(`.chapter-card[data-id="${id}"]`);
+  card.classList.toggle('open');
+}
+
+/* ==================== BUILD QUIZ ==================== */
+function buildQuiz(ch) {
+  const qHtml = ch.quiz.map((q,qi) => `
+    <div class="quiz-q" id="q-${ch.id}-${qi}">
+      <div class="quiz-q-num mono">Q${qi+1} of ${ch.quiz.length}</div>
+      <div class="quiz-q-text">${q.q}</div>
+      <div class="quiz-options">
+        ${q.opts.map((opt,oi)=>`
+          <button class="quiz-opt" onclick="answerQ(${ch.id},${qi},${oi})"
+            id="opt-${ch.id}-${qi}-${oi}">
+            <span class="opt-key">${String.fromCharCode(65+oi)}.</span>
+            <span>${opt}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div class="explanation" id="exp-${ch.id}-${qi}">
+        <strong>Explanation</strong>
+        ${q.exp}
+      </div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="quiz-wrap">
+      <div class="quiz-title">
+        <span>📝</span> Chapter Quiz — ${ch.quiz.length} Questions
+      </div>
+      <div id="quiz-body-${ch.id}">
+        ${qHtml}
+      </div>
+      <div class="quiz-actions">
+        <button class="btn btn-ghost" onclick="resetQuiz(${ch.id})">↺ Reset Quiz</button>
+        <div class="quiz-result" id="result-${ch.id}"></div>
+      </div>
+    </div>
+  `;
+}
+
+/* ==================== QUIZ LOGIC ==================== */
+const answered = {}; // "ch-qi" -> chosen option
+const chAnswered = {}; // ch.id -> count answered
+
+function answerQ(chId, qi, chosen) {
+  const key = `${chId}-${qi}`;
+  if(answered[key] !== undefined) return; // already answered
+  answered[key] = chosen;
+
+  const ch = CHAPTERS.find(c=>c.id===chId);
+  const q = ch.quiz[qi];
+  const isCorrect = chosen === q.ans;
+
+  // style options
+  const opts = document.querySelectorAll(`[id^="opt-${chId}-${qi}-"]`);
+  opts.forEach((btn, oi) => {
+    btn.classList.add('disabled');
+    btn.disabled = true;
+    if(oi === q.ans) btn.classList.add('correct');
+    else if(oi === chosen && !isCorrect) btn.classList.add('wrong');
+  });
+
+  // show explanation
+  document.getElementById(`exp-${chId}-${qi}`).classList.add('show');
+
+  // count answered for this chapter
+  chAnswered[chId] = (chAnswered[chId] || 0) + 1;
+
+  // if all answered, show score
+  if(chAnswered[chId] === ch.quiz.length) {
+    let correct = 0;
+    ch.quiz.forEach((_,i)=>{
+      if(answered[`${chId}-${i}`] === ch.quiz[i].ans) correct++;
+    });
+    const pct = Math.round(correct / ch.quiz.length * 100);
+    const grade = letterGrade(pct);
+    const resultEl = document.getElementById(`result-${chId}`);
+    resultEl.classList.add('show');
+    resultEl.innerHTML = `Score: ${correct}/${ch.quiz.length} (${pct}%) — Grade: <span class="letter-grade grade-${grade}">${grade}</span>`;
+    setScore(chId, correct, ch.quiz.length);
+    updateChip(chId, correct, ch.quiz.length);
+  }
+}
+
+function updateChip(chId, correct, total) {
+  const pct = Math.round(correct/total*100);
+  const chip = document.getElementById(`chip-${chId}`);
+  if(!chip) return;
+  chip.textContent = `${correct}/${total} (${pct}%)`;
+  chip.classList.remove('scored','perfect');
+  chip.classList.add(pct === 100 ? 'perfect' : 'scored');
+}
+
+function resetQuiz(chId) {
+  const ch = CHAPTERS.find(c=>c.id===chId);
+  ch.quiz.forEach((_,qi)=>{
+    delete answered[`${chId}-${qi}`];
+    const opts = document.querySelectorAll(`[id^="opt-${chId}-${qi}-"]`);
+    opts.forEach(btn=>{ btn.classList.remove('correct','wrong','disabled'); btn.disabled=false; });
+    document.getElementById(`exp-${chId}-${qi}`).classList.remove('show');
+  });
+  delete chAnswered[chId];
+  document.getElementById(`result-${chId}`).classList.remove('show');
+  document.getElementById(`result-${chId}`).innerHTML = '';
+  // reset chip
+  const chip = document.getElementById(`chip-${chId}`);
+  if(chip){ chip.textContent='Not attempted'; chip.classList.remove('scored','perfect'); }
+}
+
+/* ==================== FLASHCARDS ==================== */
+function buildFlashcards() {
+  const grid = document.getElementById('fcGrid');
+  FLASHCARDS.forEach((fc,i) => {
+    const card = document.createElement('div');
+    card.className = 'fc-card';
+    card.innerHTML = `
+      <div class="fc-inner">
+        <div class="fc-face fc-front">
+          <div class="fc-tag mono">${fc.tag}</div>
+          <div class="fc-term">${fc.term}</div>
+          <div class="fc-hint">tap to flip</div>
+        </div>
+        <div class="fc-face fc-back">
+          <div class="fc-tag mono">${fc.tag}</div>
+          <div class="fc-def">${fc.def}</div>
+        </div>
+      </div>
+    `;
+    card.addEventListener('click',()=>card.classList.toggle('flipped'));
+    grid.appendChild(card);
+  });
+}
+
+/* ==================== SEARCH ==================== */
+document.getElementById('search').addEventListener('input', function() {
+  const val = this.value.toLowerCase().trim();
+  const cards = document.querySelectorAll('.chapter-card');
+  let anyVisible = false;
+  cards.forEach(card=>{
+    const title = card.dataset.title || '';
+    const tag = (card.querySelector('.ch-num')?.textContent||'').toLowerCase();
+    const match = !val || title.includes(val) || tag.includes(val);
+    card.classList.toggle('hidden', !match);
+    if(match){ anyVisible = true; card.classList.toggle('search-match', !!val); }
+    else card.classList.remove('search-match');
+  });
+  document.getElementById('noResults').style.display = anyVisible ? 'none' : 'block';
+});
+
+/* ==================== THEME TOGGLE ==================== */
+const themeBtn = document.getElementById('themeToggle');
+themeBtn.addEventListener('click',()=>{
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeBtn.textContent = isDark ? '🌙' : '☀️';
+});
+
+/* ==================== INIT ==================== */
+buildChapters();
+buildFlashcards();
+updateStats();
+updateGrades();
+</script>
+</body>
+</html>

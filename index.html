@@ -1,1057 +1,1035 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>studystudy — Data Structures AI Tutor</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyStudy — Data Structures</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0a0a0f;
-    --surface: #111118;
-    --card: #16161f;
-    --border: #2a2a3a;
-    --accent: #00e5ff;
-    --accent2: #7c3aed;
-    --accent3: #f59e0b;
+    --surface: #13131a;
+    --surface2: #1c1c28;
+    --accent: #7fff6e;
+    --accent2: #ff6eb4;
+    --accent3: #6eb4ff;
     --text: #e8e8f0;
-    --muted: #6b6b80;
-    --success: #10b981;
+    --muted: #6b6b88;
+    --border: #2a2a3d;
+    --correct: #7fff6e;
+    --wrong: #ff6e6e;
+    --warn: #ffd96e;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Syne', sans-serif;
-    overflow-x: hidden;
-    cursor: none;
-  }
-
-  /* Custom cursor */
-  .cursor {
-    position: fixed;
-    width: 12px; height: 12px;
-    background: var(--accent);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition: transform 0.1s ease, width 0.2s, height 0.2s, background 0.2s;
-    mix-blend-mode: screen;
-  }
-  .cursor-ring {
-    position: fixed;
-    width: 36px; height: 36px;
-    border: 1px solid var(--accent);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transform: translate(-50%, -50%);
-    transition: transform 0.15s ease, width 0.2s, height 0.2s, opacity 0.2s;
-    opacity: 0.5;
-  }
-  body:has(a:hover) .cursor { width: 20px; height: 20px; background: var(--accent3); }
-  body:has(button:hover) .cursor { width: 20px; height: 20px; background: var(--accent3); }
-
-  /* Grid background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: 20px 48px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    background: rgba(10,10,15,0.85);
-    backdrop-filter: blur(16px);
-  }
-  .nav-logo {
     font-family: 'Space Mono', monospace;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--accent);
-    letter-spacing: 0.05em;
-  }
-  .nav-logo span { color: var(--text); }
-  .nav-links {
-    display: flex;
-    gap: 36px;
-    list-style: none;
-  }
-  .nav-links a {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--accent); }
-  .nav-cta {
-    background: var(--accent);
-    color: var(--bg) !important;
-    padding: 10px 24px;
-    border-radius: 2px;
-    font-weight: 700 !important;
-    letter-spacing: 0.08em;
-    transition: box-shadow 0.2s !important;
-  }
-  .nav-cta:hover { box-shadow: 0 0 24px rgba(0,229,255,0.5) !important; color: var(--bg) !important; }
-
-  /* HERO */
-  .hero {
-    position: relative;
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    padding: 120px 48px 80px;
-    overflow: hidden;
-    z-index: 1;
-  }
-  .hero-content {
-    max-width: 760px;
-    position: relative;
-    z-index: 2;
-  }
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(0,229,255,0.08);
-    border: 1px solid rgba(0,229,255,0.2);
-    color: var(--accent);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.75rem;
-    padding: 6px 14px;
-    border-radius: 2px;
-    margin-bottom: 32px;
-    letter-spacing: 0.1em;
-    animation: fadeUp 0.6s ease forwards;
-    opacity: 0;
-  }
-  .hero-badge::before {
-    content: '';
-    width: 8px; height: 8px;
-    background: var(--accent);
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
+    overflow-x: hidden;
   }
 
-  .hero h1 {
-    font-size: clamp(3rem, 7vw, 6rem);
-    font-weight: 800;
-    line-height: 0.95;
-    letter-spacing: -0.03em;
-    margin-bottom: 28px;
-    animation: fadeUp 0.6s 0.1s ease forwards;
-    opacity: 0;
-  }
-  .hero h1 .accent { color: var(--accent); }
-  .hero h1 .dim { color: var(--muted); }
-
-  .hero-sub {
-    font-size: 1.15rem;
-    color: var(--muted);
-    line-height: 1.7;
-    max-width: 540px;
-    margin-bottom: 44px;
-    animation: fadeUp 0.6s 0.2s ease forwards;
-    opacity: 0;
-  }
-
-  .hero-actions {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    animation: fadeUp 0.6s 0.3s ease forwards;
-    opacity: 0;
-  }
-  .btn-primary {
-    background: var(--accent);
-    color: var(--bg);
-    border: none;
-    padding: 16px 36px;
-    font-family: 'Syne', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: box-shadow 0.2s, transform 0.1s;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .btn-primary:hover {
-    box-shadow: 0 0 32px rgba(0,229,255,0.5);
-    transform: translateY(-1px);
-  }
-  .btn-ghost {
-    background: transparent;
-    color: var(--text);
-    border: 1px solid var(--border);
-    padding: 16px 36px;
-    font-family: 'Syne', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: border-color 0.2s, color 0.2s;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* Hero orb */
-  .hero-orb {
-    position: absolute;
-    right: -100px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
-    background: radial-gradient(circle at center, rgba(124,58,237,0.15) 0%, rgba(0,229,255,0.05) 40%, transparent 70%);
-    pointer-events: none;
-    animation: orbFloat 8s ease-in-out infinite;
-  }
-  @keyframes orbFloat {
-    0%, 100% { transform: translateY(-50%) scale(1); }
-    50% { transform: translateY(-52%) scale(1.04); }
-  }
-
-  /* Floating code snippets */
-  .code-float {
-    position: absolute;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    color: rgba(0,229,255,0.2);
-    pointer-events: none;
-    white-space: pre;
-    animation: floatCode 12s ease-in-out infinite;
-  }
-  .code-float:nth-child(1) { right: 80px; top: 20%; animation-delay: 0s; }
-  .code-float:nth-child(2) { right: 260px; top: 60%; animation-delay: -4s; }
-  .code-float:nth-child(3) { right: 60px; bottom: 20%; animation-delay: -8s; }
-  @keyframes floatCode {
-    0%, 100% { transform: translateY(0); opacity: 0.3; }
-    50% { transform: translateY(-20px); opacity: 0.6; }
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* STATS BAR */
-  .stats-bar {
-    position: relative;
-    z-index: 1;
-    background: var(--card);
-    border-top: 1px solid var(--border);
+  /* HEADER */
+  header {
     border-bottom: 1px solid var(--border);
-    padding: 28px 48px;
+    padding: 18px 40px;
     display: flex;
-    justify-content: center;
-    gap: 80px;
-  }
-  .stat {
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100;
   }
-  .stat-num {
-    font-size: 2rem;
+
+  .logo {
+    font-family: 'Syne', sans-serif;
     font-weight: 800;
+    font-size: 1.4rem;
     color: var(--accent);
-    font-family: 'Space Mono', monospace;
+    letter-spacing: -1px;
   }
-  .stat-label {
-    font-size: 0.75rem;
+
+  .logo span { color: var(--accent2); }
+
+  .tagline {
+    font-size: 0.65rem;
     color: var(--muted);
-    letter-spacing: 0.12em;
+    border-left: 1px solid var(--border);
+    padding-left: 16px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    font-weight: 600;
   }
+
+  /* NAV TABS */
+  .nav-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 40px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+
+  .nav-tab {
+    padding: 14px 24px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
   /* SECTIONS */
-  section {
-    position: relative;
-    z-index: 1;
-    padding: 100px 48px;
-    max-width: 1200px;
-    margin: 0 auto;
+  .section { display: none; padding: 40px; max-width: 960px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+    color: var(--text);
   }
 
-  .section-tag {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--accent);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .section-tag::before {
-    content: '';
-    width: 24px;
-    height: 1px;
-    background: var(--accent);
-  }
-  .section-title {
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin-bottom: 20px;
-  }
   .section-sub {
     color: var(--muted);
-    font-size: 1rem;
-    max-width: 520px;
-    line-height: 1.7;
-    margin-bottom: 60px;
+    font-size: 0.72rem;
+    margin-bottom: 36px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
-  /* FEATURES GRID */
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: var(--border);
+  /* CARDS */
+  .card {
+    background: var(--surface);
     border: 1px solid var(--border);
-  }
-  .feature-card {
-    background: var(--card);
-    padding: 40px 36px;
-    transition: background 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-  .feature-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(0,229,255,0.04) 0%, transparent 60%);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .feature-card:hover { background: #1a1a25; }
-  .feature-card:hover::after { opacity: 1; }
-  .feature-icon {
-    font-size: 1.6rem;
+    border-radius: 12px;
+    padding: 28px;
     margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent3);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* QUIZ */
+  .quiz-question {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 22px;
+    color: var(--text);
+  }
+
+  .quiz-meta {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .options-grid {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .option-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.18s;
+    line-height: 1.5;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent3);
+    color: var(--accent3);
+    background: rgba(110,180,255,0.06);
+  }
+
+  .option-btn.correct {
+    border-color: var(--correct);
+    background: rgba(127,255,110,0.08);
+    color: var(--correct);
+  }
+
+  .option-btn.wrong {
+    border-color: var(--wrong);
+    background: rgba(255,110,110,0.08);
+    color: var(--wrong);
+  }
+
+  .option-btn:disabled { cursor: default; }
+
+  .feedback-box {
+    padding: 16px 20px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  .feedback-box.correct {
+    background: rgba(127,255,110,0.07);
+    border: 1px solid var(--correct);
+    color: var(--correct);
     display: block;
   }
-  .feature-num {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--muted);
-    letter-spacing: 0.15em;
-    margin-bottom: 12px;
-  }
-  .feature-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 12px;
-    letter-spacing: -0.01em;
-  }
-  .feature-desc {
-    font-size: 0.88rem;
-    color: var(--muted);
-    line-height: 1.65;
+
+  .feedback-box.wrong {
+    background: rgba(255,110,110,0.07);
+    border: 1px solid var(--wrong);
+    color: var(--wrong);
+    display: block;
   }
 
-  /* CHAT DEMO */
-  .chat-section {
-    padding: 100px 48px;
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
-  }
-  .chat-window {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
-  }
-  .chat-topbar {
-    background: var(--surface);
-    padding: 14px 20px;
+  .quiz-controls {
     display: flex;
     align-items: center;
-    gap: 8px;
-    border-bottom: 1px solid var(--border);
+    gap: 14px;
+    flex-wrap: wrap;
   }
-  .chat-dot { width: 10px; height: 10px; border-radius: 50%; }
-  .chat-dot:nth-child(1) { background: #ff5f56; }
-  .chat-dot:nth-child(2) { background: #ffbd2e; }
-  .chat-dot:nth-child(3) { background: #27c93f; }
-  .chat-title {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
+
+  .progress-bar-wrap {
+    background: var(--surface2);
+    border-radius: 4px;
+    height: 4px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--accent);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+
+  .score-badge {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
     color: var(--muted);
-    margin-left: auto;
-    margin-right: auto;
+    letter-spacing: 0.04em;
   }
-  .chat-messages {
-    padding: 24px 20px;
+
+  /* BUTTONS */
+  .btn {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 7px;
+    padding: 11px 22px;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0a0f;
+  }
+
+  .btn-primary:hover { background: #9fffb0; transform: translateY(-1px); }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover { border-color: var(--accent3); color: var(--accent3); }
+
+  .btn-pink {
+    background: var(--accent2);
+    color: #0a0a0f;
+  }
+  .btn-pink:hover { background: #ffaacc; transform: translateY(-1px); }
+
+  /* FLASHCARDS */
+  .flashcard-wrap {
+    perspective: 1200px;
+    margin-bottom: 24px;
+  }
+
+  .flashcard {
+    position: relative;
+    width: 100%;
+    min-height: 200px;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+    cursor: pointer;
+  }
+
+  .flashcard.flipped { transform: rotateY(180deg); }
+
+  .fc-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    max-height: 460px;
-    overflow-y: auto;
-  }
-  .chat-messages::-webkit-scrollbar { width: 4px; }
-  .chat-messages::-webkit-scrollbar-track { background: transparent; }
-  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-  .msg {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-  }
-  .msg-avatar {
-    width: 30px; height: 30px;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    font-size: 0.7rem;
-    font-family: 'Space Mono', monospace;
-    font-weight: 700;
-    flex-shrink: 0;
+    align-items: center;
+    padding: 32px;
+    text-align: center;
+    min-height: 200px;
   }
-  .msg-avatar.ai { background: rgba(0,229,255,0.15); color: var(--accent); border: 1px solid rgba(0,229,255,0.2); }
-  .msg-avatar.user { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.2); }
-  .msg-body { flex: 1; }
-  .msg-name {
-    font-size: 0.7rem;
-    font-family: 'Space Mono', monospace;
+
+  .fc-front {
+    background: var(--surface);
+  }
+
+  .fc-back {
+    background: var(--surface2);
+    transform: rotateY(180deg);
+    border-color: var(--accent2);
+  }
+
+  .fc-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 6px;
-    letter-spacing: 0.05em;
+    margin-bottom: 14px;
   }
-  .msg-text {
-    font-size: 0.85rem;
+
+  .fc-content {
+    font-size: 1rem;
     line-height: 1.6;
     color: var(--text);
-    background: var(--surface);
-    padding: 12px 16px;
-    border-radius: 2px;
-    border: 1px solid var(--border);
   }
-  .msg-text.ai-msg { border-color: rgba(0,229,255,0.12); }
-  .msg-text code {
-    font-family: 'Space Mono', monospace;
-    background: rgba(0,229,255,0.08);
-    color: var(--accent);
-    padding: 2px 6px;
-    border-radius: 2px;
-    font-size: 0.8rem;
-  }
-  .chat-input-bar {
-    padding: 16px 20px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    gap: 10px;
-  }
-  .chat-input {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 10px 16px;
-    font-family: 'Syne', sans-serif;
-    font-size: 0.85rem;
-    border-radius: 2px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .chat-input:focus { border-color: var(--accent); }
-  .chat-input::placeholder { color: var(--muted); }
-  .chat-send {
-    background: var(--accent);
-    color: var(--bg);
-    border: none;
-    padding: 10px 18px;
-    border-radius: 2px;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.75rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: box-shadow 0.2s;
-  }
-  .chat-send:hover { box-shadow: 0 0 16px rgba(0,229,255,0.4); }
 
-  /* TOPICS */
-  .topics-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-  .topic-pill {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 20px 20px;
-    border-radius: 2px;
-    transition: border-color 0.2s, transform 0.15s;
-    cursor: default;
-  }
-  .topic-pill:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .topic-pill-icon { font-size: 1.4rem; margin-bottom: 10px; display: block; }
-  .topic-pill-name {
-    font-size: 0.88rem;
-    font-weight: 700;
-    margin-bottom: 4px;
-    letter-spacing: -0.01em;
-  }
-  .topic-pill-sub {
-    font-size: 0.75rem;
+  .fc-back .fc-content { color: var(--accent2); font-size: 0.88rem; }
+
+  .fc-hint {
+    font-size: 0.62rem;
     color: var(--muted);
-    font-family: 'Space Mono', monospace;
+    margin-top: 16px;
   }
 
-  /* HOW IT WORKS */
-  .steps {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-  .step {
-    display: grid;
-    grid-template-columns: 60px 1fr;
-    gap: 28px;
-    padding: 32px 0;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-  }
-  .step:last-child { border-bottom: none; }
-  .step-num {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--accent);
-    padding-top: 4px;
-    letter-spacing: 0.1em;
-  }
-  .step-content h3 {
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-    letter-spacing: -0.01em;
-  }
-  .step-content p {
-    font-size: 0.88rem;
-    color: var(--muted);
-    line-height: 1.65;
-  }
-  .step-tag {
-    display: inline-block;
-    background: rgba(245,158,11,0.1);
-    border: 1px solid rgba(245,158,11,0.2);
-    color: var(--accent3);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.65rem;
-    padding: 3px 10px;
-    border-radius: 2px;
-    margin-top: 10px;
-    letter-spacing: 0.1em;
-  }
-
-  /* CTA SECTION */
-  .cta-section {
-    margin: 0;
-    padding: 0;
-    max-width: 100%;
-    position: relative;
-    z-index: 1;
-  }
-  .cta-inner {
-    background: var(--card);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 100px 48px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .cta-inner::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px; height: 300px;
-    background: radial-gradient(ellipse, rgba(0,229,255,0.06) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .cta-inner h2 {
-    font-size: clamp(2.2rem, 5vw, 4rem);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    margin-bottom: 20px;
-    position: relative;
-  }
-  .cta-inner p {
-    color: var(--muted);
-    font-size: 1rem;
-    margin-bottom: 44px;
-    position: relative;
-  }
-
-  /* FOOTER */
-  footer {
-    position: relative;
-    z-index: 1;
-    padding: 40px 48px;
+  .fc-nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-top: 1px solid var(--border);
+    margin-top: 10px;
   }
-  .footer-logo {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.9rem;
-    color: var(--accent);
+
+  .fc-counter {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
     font-weight: 700;
   }
-  .footer-copy {
-    font-size: 0.8rem;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-  }
-  .footer-links {
+
+  .fc-category {
     display: flex;
-    gap: 24px;
-    list-style: none;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
   }
-  .footer-links a {
+
+  .cat-btn {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--border);
+    background: var(--surface2);
     color: var(--muted);
-    text-decoration: none;
-    font-size: 0.8rem;
-    transition: color 0.2s;
-    font-family: 'Space Mono', monospace;
+    padding: 7px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.16s;
   }
-  .footer-links a:hover { color: var(--accent); }
 
-  /* TYPING ANIMATION */
-  .typing-cursor::after {
-    content: '|';
-    animation: blink 1s step-end infinite;
+  .cat-btn:hover, .cat-btn.active {
+    border-color: var(--accent);
     color: var(--accent);
-  }
-  @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
-
-  /* Scroll reveal */
-  .reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: none;
+    background: rgba(127,255,110,0.06);
   }
 
-  /* Responsive */
-  @media (max-width: 900px) {
-    nav { padding: 16px 24px; }
-    .nav-links { display: none; }
-    .hero { padding: 100px 24px 60px; }
-    section { padding: 60px 24px; }
-    .features-grid { grid-template-columns: 1fr; }
-    .chat-section { grid-template-columns: 1fr; padding: 60px 24px; gap: 40px; }
-    .topics-grid { grid-template-columns: repeat(2, 1fr); }
-    .stats-bar { gap: 40px; padding: 24px; flex-wrap: wrap; }
-    footer { flex-direction: column; gap: 16px; text-align: center; }
-    .hero-orb { display: none; }
-    .code-float { display: none; }
+  /* RUNTIMES TABLE */
+  .rt-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    margin-top: 12px;
+  }
+
+  .rt-table th {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .rt-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid rgba(42,42,61,0.5);
+    vertical-align: middle;
+    line-height: 1.5;
+  }
+
+  .rt-table tr:last-child td { border-bottom: none; }
+  .rt-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .rt-table td:first-child { color: var(--accent3); font-weight: 700; }
+
+  .o-label {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .o-best { background: rgba(127,255,110,0.12); color: var(--correct); }
+  .o-good { background: rgba(110,180,255,0.12); color: var(--accent3); }
+  .o-ok   { background: rgba(255,217,110,0.12); color: var(--warn); }
+  .o-bad  { background: rgba(255,110,110,0.12); color: var(--wrong); }
+
+  .rt-section-head {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    margin: 32px 0 14px;
+    color: var(--accent2);
+    letter-spacing: -0.02em;
+  }
+
+  /* RESULT SCREEN */
+  .result-screen {
+    text-align: center;
+    padding: 48px 24px;
+  }
+
+  .result-score {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 4rem;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  .result-msg {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  /* STEP EXPLAINER */
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 0.75rem;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content { font-size: 0.85rem; line-height: 1.65; }
+  .step-content strong { color: var(--accent3); }
+
+  code {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8em;
+    color: var(--accent2);
+  }
+
+  /* QUIZ FILTER */
+  .quiz-filter {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  /* HIDDEN */
+  .hidden { display: none !important; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 600px) {
+    header { padding: 14px 20px; }
+    .nav-tabs { padding: 0 16px; }
+    .section { padding: 24px 20px; }
+    .section-title { font-size: 1.3rem; }
   }
 </style>
 </head>
 <body>
 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
+<header>
+  <div class="logo">study<span>study</span></div>
+  <div class="tagline">Data Structures · Arrays · Linked Lists · Recursion</div>
+</header>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">study<span>study</span></div>
-  <ul class="nav-links">
-    <li><a href="#features">Features</a></li>
-    <li><a href="#topics">Topics</a></li>
-    <li><a href="#how">How It Works</a></li>
-    <li><a href="#start" class="nav-cta">Start Session</a></li>
-  </ul>
-</nav>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-content">
-    <div class="hero-badge">AI STUDY ASSISTANT · LIVE</div>
-    <h1>
-      Master<br/>
-      <span class="accent">Data Structures</span><br/>
-      <span class="dim">Like Never Before</span>
-    </h1>
-    <p class="hero-sub">
-      Your expert AI tutor for arrays, linked lists, and recursion. 
-      Adaptive explanations, step-by-step walkthroughs, and Socratic 
-      questioning that finds and fills your gaps — fast.
-    </p>
-    <div class="hero-actions">
-      <a href="#start" class="btn-primary">Start Studying Now</a>
-      <a href="#features" class="btn-ghost">See Features</a>
-    </div>
-  </div>
-  <div class="hero-orb"></div>
-  <div class="code-float">node.next = newNode
-newNode.prev = node
-head = newNode</div>
-  <div class="code-float">def recurse(n):
-  if n == 0: return 0
-  return n + recurse(n-1)</div>
-  <div class="code-float">arr[i] ↔ arr[j]
-O(n) insert
-O(1) access</div>
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('quiz')">📝 Quiz</button>
+  <button class="nav-tab" onclick="switchTab('flashcards')">🃏 Flashcards</button>
+  <button class="nav-tab" onclick="switchTab('runtimes')">⚡ Runtimes</button>
+  <button class="nav-tab" onclick="switchTab('concepts')">🧠 Concepts</button>
 </div>
 
-<!-- STATS BAR -->
-<div class="stats-bar">
-  <div class="stat">
-    <span class="stat-num">5+</span>
-    <span class="stat-label">Teaching Methods</span>
-  </div>
-  <div class="stat">
-    <span class="stat-num">4</span>
-    <span class="stat-label">Core Topics</span>
-  </div>
-  <div class="stat">
-    <span class="stat-num">60m</span>
-    <span class="stat-label">Avg. Prep Session</span>
-  </div>
-  <div class="stat">
-    <span class="stat-num">∞</span>
-    <span class="stat-label">Practice Problems</span>
-  </div>
-</div>
+<!-- ═══════════════════════════════ QUIZ ═══════════════════════════════ -->
+<div id="tab-quiz" class="section active">
+  <div class="section-title">Practice Quiz</div>
+  <div class="section-sub">Arrays · Linked Lists · Recursion · Insertion · Deletion</div>
 
-<!-- FEATURES -->
-<section id="features">
-  <div class="section-tag">What studystudy does</div>
-  <h2 class="section-title">Built to make you<br/><span style="color:var(--accent)">actually understand</span></h2>
-  <p class="section-sub">No surface-level answers. No skipped steps. Just rigorous, adaptive tutoring that builds deep understanding.</p>
-
-  <div class="features-grid reveal">
-    <div class="feature-card">
-      <span class="feature-icon">🧩</span>
-      <div class="feature-num">01 — QUIZ</div>
-      <div class="feature-title">Practice Quizzes</div>
-      <div class="feature-desc">Randomized, adaptive quizzes on arrays, linked lists, and recursion. Timed pressure, instant feedback, concept breakdowns.</div>
-    </div>
-    <div class="feature-card">
-      <span class="feature-icon">🔬</span>
-      <div class="feature-num">02 — EXPLAIN</div>
-      <div class="feature-title">Deep Explanations</div>
-      <div class="feature-desc">Never just a definition. Every concept is unpacked with analogies, diagrams in text, and real-world examples that stick.</div>
-    </div>
-    <div class="feature-card">
-      <span class="feature-icon">🪜</span>
-      <div class="feature-num">03 — SOLVE</div>
-      <div class="feature-title">Step-by-Step Solutions</div>
-      <div class="feature-desc">Walk through any problem with full reasoning at each stage. Understand the why, not just the what.</div>
-    </div>
-    <div class="feature-card">
-      <span class="feature-icon">🧠</span>
-      <div class="feature-num">04 — PROBE</div>
-      <div class="feature-title">Socratic Questioning</div>
-      <div class="feature-desc">studystudy asks the right questions to expose hidden gaps in your understanding before they hurt your grade.</div>
-    </div>
-    <div class="feature-card">
-      <span class="feature-icon">🃏</span>
-      <div class="feature-num">05 — FLASH</div>
-      <div class="feature-title">Flashcard Q&A</div>
-      <div class="feature-desc">Rapid-fire concept cards for last-minute review. Test recall, flip for the answer, track what needs more work.</div>
-    </div>
-    <div class="feature-card">
-      <span class="feature-icon">⏱️</span>
-      <div class="feature-num">06 — PLAN</div>
-      <div class="feature-title">Session Planning</div>
-      <div class="feature-desc">Tell studystudy how long you have. Get a smart, prioritized study plan that maximizes your prep time.</div>
-    </div>
+  <div class="quiz-filter">
+    <button class="cat-btn active" onclick="setQuizFilter('all',this)">All Topics</button>
+    <button class="cat-btn" onclick="setQuizFilter('array',this)">Arrays</button>
+    <button class="cat-btn" onclick="setQuizFilter('sll',this)">Singly LL</button>
+    <button class="cat-btn" onclick="setQuizFilter('dll',this)">Doubly LL</button>
+    <button class="cat-btn" onclick="setQuizFilter('cll',this)">Circular LL</button>
+    <button class="cat-btn" onclick="setQuizFilter('recursion',this)">Recursion</button>
   </div>
-</section>
 
-<!-- CHAT DEMO -->
-<div class="chat-section">
-  <div class="chat-window reveal">
-    <div class="chat-topbar">
-      <div class="chat-dot"></div>
-      <div class="chat-dot"></div>
-      <div class="chat-dot"></div>
-      <span class="chat-title">studystudy · Data Structures</span>
-    </div>
-    <div class="chat-messages" id="chatMessages">
-      <div class="msg">
-        <div class="msg-avatar ai">SS</div>
-        <div class="msg-body">
-          <div class="msg-name">studystudy</div>
-          <div class="msg-text ai-msg">Welcome! I'm studystudy. Before I explain linked list insertion, tell me — what do you think needs to happen when you insert a node at the <code>front</code> of a singly linked list?</div>
-        </div>
+  <div id="quiz-area">
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="card">
+      <div class="quiz-meta" id="quiz-meta">Question 1 of 30</div>
+      <div class="quiz-question" id="quiz-question"></div>
+      <div class="options-grid" id="options-grid"></div>
+      <div class="feedback-box" id="feedback-box"></div>
+      <div class="quiz-controls">
+        <button class="btn btn-primary hidden" id="next-btn" onclick="nextQuestion()">Next →</button>
+        <span class="score-badge" id="score-badge">Score: 0/0</span>
       </div>
-      <div class="msg">
-        <div class="msg-avatar user">YOU</div>
-        <div class="msg-body">
-          <div class="msg-name">you</div>
-          <div class="msg-text">Uh... you just add the node to the front?</div>
-        </div>
-      </div>
-      <div class="msg">
-        <div class="msg-avatar ai">SS</div>
-        <div class="msg-body">
-          <div class="msg-name">studystudy</div>
-          <div class="msg-text ai-msg">Good start — but what about the old head? If you just "add to front" without updating pointers, you lose the entire list. The key step: <code>newNode.next = head</code>, then <code>head = newNode</code>. Order matters. Why do you think swapping those two lines would break everything?</div>
-        </div>
-      </div>
-    </div>
-    <div class="chat-input-bar">
-      <input class="chat-input" id="demoInput" placeholder="Ask a question..." />
-      <button class="chat-send" onclick="sendDemo()">SEND →</button>
     </div>
   </div>
 
-  <div class="reveal">
-    <div class="section-tag">Live Demo</div>
-    <h2 class="section-title">See it in<br/><span style="color:var(--accent)">action</span></h2>
-    <p class="section-sub" style="margin-bottom:32px;">
-      studystudy doesn't just answer — it teaches. It challenges your reasoning, catches misconceptions, and guides you to the right answer through dialogue.
-    </p>
-    <div class="steps" style="margin-top:0;">
-      <div class="step" style="padding-top:0;">
-        <div class="step-num">01</div>
-        <div class="step-content">
-          <h3>Gauge your level first</h3>
-          <p>Every session starts by understanding what you already know so nothing is over- or under-explained.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <div class="step-content">
-          <h3>Challenge surface answers</h3>
-          <p>When you give a vague answer, studystudy pushes deeper — not dismissively, but constructively.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <div class="step-content">
-          <h3>Check comprehension always</h3>
-          <p>After every explanation, a follow-up question cements the concept and exposes any remaining gaps.</p>
-        </div>
-      </div>
+  <div id="result-area" class="hidden">
+    <div class="card result-screen">
+      <div class="result-score" id="result-score"></div>
+      <div class="result-msg" id="result-msg"></div>
+      <button class="btn btn-primary" onclick="restartQuiz()">Restart Quiz</button>
+      &nbsp;
+      <button class="btn btn-secondary" onclick="restartQuiz(true)">Retry Wrong Answers</button>
     </div>
   </div>
 </div>
 
-<!-- TOPICS -->
-<section id="topics">
-  <div class="section-tag">Core curriculum</div>
-  <h2 class="section-title">Everything on<br/><span style="color:var(--accent)">the quiz</span></h2>
-  <p class="section-sub">studystudy is specialized and focused. These are the exact topics covered — nothing more, nothing less.</p>
-  <div class="topics-grid reveal">
-    <div class="topic-pill">
-      <span class="topic-pill-icon">📦</span>
-      <div class="topic-pill-name">Arrays</div>
-      <div class="topic-pill-sub">Static · Dynamic · 2D</div>
-    </div>
-    <div class="topic-pill">
-      <span class="topic-pill-icon">🔗</span>
-      <div class="topic-pill-name">Singly Linked</div>
-      <div class="topic-pill-sub">Insert · Delete · Traverse</div>
-    </div>
-    <div class="topic-pill">
-      <span class="topic-pill-icon">↔️</span>
-      <div class="topic-pill-name">Doubly Linked</div>
-      <div class="topic-pill-sub">Prev · Next · Both ends</div>
-    </div>
-    <div class="topic-pill">
-      <span class="topic-pill-icon">🔄</span>
-      <div class="topic-pill-name">Circular Lists</div>
-      <div class="topic-pill-sub">Loop detection · Tail→Head</div>
-    </div>
-    <div class="topic-pill">
-      <span class="topic-pill-icon">🔁</span>
-      <div class="topic-pill-name">Recursion</div>
-      <div class="topic-pill-sub">Base case · Call stack</div>
-    </div>
-    <div class="topic-pill">
-      <span class="topic-pill-icon">🔃</span>
-      <div class="topic-pill-name">Loop → Recursion</div>
-      <div class="topic-pill-sub">Conversion patterns</div>
-    </div>
-    <div class="topic-pill">
-      <span class="topic-pill-icon">➕</span>
-      <div class="topic-pill-name">Insert Operations</div>
-      <div class="topic-pill-sub">Front · Back · Middle</div>
-    </div>
-    <div class="topic-pill">
-      <span class="topic-pill-icon">🗑️</span>
-      <div class="topic-pill-name">Delete Operations</div>
-      <div class="topic-pill-sub">Front · Back · Anywhere</div>
-    </div>
-  </div>
-</section>
+<!-- ═══════════════════════════════ FLASHCARDS ═══════════════════════════════ -->
+<div id="tab-flashcards" class="section">
+  <div class="section-title">Flashcards</div>
+  <div class="section-sub">Click card to reveal answer · Navigate with buttons</div>
 
-<!-- HOW IT WORKS -->
-<section id="how">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;">
-    <div class="reveal">
-      <div class="section-tag">The process</div>
-      <h2 class="section-title">How a session<br/><span style="color:var(--accent)">actually works</span></h2>
-      <p class="section-sub">A structured but flexible flow that adapts to you in real time.</p>
-    </div>
-    <div class="steps reveal">
-      <div class="step" style="padding-top:0;">
-        <div class="step-num">STEP 01</div>
-        <div class="step-content">
-          <h3>Tell studystudy your goal</h3>
-          <p>Quiz prep, concept review, problem-solving practice. Tell it how much time you have.</p>
-          <span class="step-tag">SESSION START</span>
-        </div>
+  <div class="fc-category">
+    <button class="cat-btn active" onclick="setFCFilter('all',this)">All</button>
+    <button class="cat-btn" onclick="setFCFilter('array',this)">Arrays</button>
+    <button class="cat-btn" onclick="setFCFilter('sll',this)">Singly LL</button>
+    <button class="cat-btn" onclick="setFCFilter('dll',this)">Doubly LL</button>
+    <button class="cat-btn" onclick="setFCFilter('cll',this)">Circular LL</button>
+    <button class="cat-btn" onclick="setFCFilter('recursion',this)">Recursion</button>
+  </div>
+
+  <div class="flashcard-wrap" onclick="flipCard()">
+    <div class="flashcard" id="flashcard">
+      <div class="fc-face fc-front">
+        <div class="fc-label">Question</div>
+        <div class="fc-content" id="fc-front-text"></div>
+        <div class="fc-hint">↻ click to flip</div>
       </div>
-      <div class="step">
-        <div class="step-num">STEP 02</div>
-        <div class="step-content">
-          <h3>Get your level gauged</h3>
-          <p>3 quick diagnostic questions calibrate the depth and pace of the entire session.</p>
-          <span class="step-tag">DIAGNOSTIC</span>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">STEP 03</div>
-        <div class="step-content">
-          <h3>Learn through dialogue</h3>
-          <p>Explanations, challenges, examples, and corrections in a back-and-forth that builds real understanding.</p>
-          <span class="step-tag">CORE SESSION</span>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">STEP 04</div>
-        <div class="step-content">
-          <h3>Rapid-fire quiz to close</h3>
-          <p>End every session with a quiz blitz to surface any remaining weak spots before you close the tab.</p>
-          <span class="step-tag">ASSESSMENT</span>
-        </div>
+      <div class="fc-face fc-back">
+        <div class="fc-label">Answer</div>
+        <div class="fc-content" id="fc-back-text"></div>
       </div>
     </div>
   </div>
-</section>
 
-<!-- CTA -->
-<div class="cta-section" id="start">
-  <div class="cta-inner">
-    <h2>Ready to <span style="color:var(--accent)">ace it?</span></h2>
-    <p>One session with studystudy is worth three hours of passive reading.</p>
-    <a href="#" class="btn-primary" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
-      Start Your Session Now →
-    </a>
+  <div class="fc-nav">
+    <button class="btn btn-secondary" onclick="prevCard()">← Prev</button>
+    <span class="fc-counter" id="fc-counter">1 / 30</span>
+    <button class="btn btn-secondary" onclick="nextCard()">Next →</button>
+  </div>
+  <br>
+  <button class="btn btn-pink" onclick="shuffleCards()">🔀 Shuffle</button>
+</div>
+
+<!-- ═══════════════════════════════ RUNTIMES ═══════════════════════════════ -->
+<div id="tab-runtimes" class="section">
+  <div class="section-title">Runtime Complexity</div>
+  <div class="section-sub">Big-O for every operation across all structures</div>
+
+  <div class="rt-section-head">📦 Arrays (Static & Dynamic)</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="rt-table">
+      <thead><tr>
+        <th>Operation</th><th>Static Array</th><th>Dynamic Array</th><th>Notes</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Access by index</td><td><span class="o-label o-best">O(1)</span></td><td><span class="o-label o-best">O(1)</span></td><td>Direct memory address calculation</td></tr>
+        <tr><td>Search (unsorted)</td><td><span class="o-label o-ok">O(n)</span></td><td><span class="o-label o-ok">O(n)</span></td><td>Must scan every element</td></tr>
+        <tr><td>Search (sorted, binary)</td><td><span class="o-label o-good">O(log n)</span></td><td><span class="o-label o-good">O(log n)</span></td><td>Requires sorted array</td></tr>
+        <tr><td>Insert at front</td><td><span class="o-label o-bad">O(n)</span></td><td><span class="o-label o-bad">O(n)</span></td><td>Shift all elements right</td></tr>
+        <tr><td>Insert at back</td><td><span class="o-label o-bad">O(n)*</span></td><td><span class="o-label o-best">O(1) amort.</span></td><td>Dynamic resizes; static shifts if not at end</td></tr>
+        <tr><td>Insert at arbitrary index</td><td><span class="o-label o-bad">O(n)</span></td><td><span class="o-label o-bad">O(n)</span></td><td>Shift elements after index</td></tr>
+        <tr><td>Delete at front</td><td><span class="o-label o-bad">O(n)</span></td><td><span class="o-label o-bad">O(n)</span></td><td>Shift all elements left</td></tr>
+        <tr><td>Delete at back</td><td><span class="o-label o-best">O(1)</span></td><td><span class="o-label o-best">O(1)</span></td><td>Just decrement length</td></tr>
+        <tr><td>Delete at arbitrary index</td><td><span class="o-label o-bad">O(n)</span></td><td><span class="o-label o-bad">O(n)</span></td><td>Shift elements after index</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rt-section-head">🔗 Singly Linked List</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="rt-table">
+      <thead><tr>
+        <th>Operation</th><th>Time</th><th>Notes</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Access by index</td><td><span class="o-label o-bad">O(n)</span></td><td>Must traverse from head</td></tr>
+        <tr><td>Search</td><td><span class="o-label o-bad">O(n)</span></td><td>No random access</td></tr>
+        <tr><td>Insert at front (prepend)</td><td><span class="o-label o-best">O(1)</span></td><td>Update head pointer only</td></tr>
+        <tr><td>Insert at back (append)</td><td><span class="o-label o-bad">O(n)</span> / <span class="o-label o-best">O(1)*</span></td><td>O(1) if tail pointer maintained</td></tr>
+        <tr><td>Insert at arbitrary position</td><td><span class="o-label o-bad">O(n)</span></td><td>Traverse to position, then O(1) link</td></tr>
+        <tr><td>Delete at front</td><td><span class="o-label o-best">O(1)</span></td><td>Move head to head.next</td></tr>
+        <tr><td>Delete at back</td><td><span class="o-label o-bad">O(n)</span></td><td>Must find second-to-last node</td></tr>
+        <tr><td>Delete at arbitrary position</td><td><span class="o-label o-bad">O(n)</span></td><td>Traverse to predecessor node</td></tr>
+        <tr><td>Space</td><td><span class="o-label o-ok">O(n)</span></td><td>Extra pointer per node</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rt-section-head">↔️ Doubly Linked List</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="rt-table">
+      <thead><tr>
+        <th>Operation</th><th>Time</th><th>Notes vs Singly LL</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Access by index</td><td><span class="o-label o-bad">O(n)</span></td><td>Same — no random access</td></tr>
+        <tr><td>Insert at front</td><td><span class="o-label o-best">O(1)</span></td><td>Same</td></tr>
+        <tr><td>Insert at back</td><td><span class="o-label o-best">O(1)</span></td><td>Better — tail pointer + prev pointer</td></tr>
+        <tr><td>Insert at arbitrary position</td><td><span class="o-label o-bad">O(n)</span></td><td>Traverse, then O(1) relink (4 pointers)</td></tr>
+        <tr><td>Delete at front</td><td><span class="o-label o-best">O(1)</span></td><td>Same</td></tr>
+        <tr><td>Delete at back</td><td><span class="o-label o-best">O(1)</span></td><td>Better — use tail.prev pointer</td></tr>
+        <tr><td>Delete given node reference</td><td><span class="o-label o-best">O(1)</span></td><td>Better — no need to find predecessor</td></tr>
+        <tr><td>Delete at arbitrary index</td><td><span class="o-label o-bad">O(n)</span></td><td>Must still traverse to find node</td></tr>
+        <tr><td>Space</td><td><span class="o-label o-ok">O(n)</span></td><td>2 pointers per node (prev + next)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rt-section-head">🔄 Circular Linked List</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="rt-table">
+      <thead><tr>
+        <th>Operation</th><th>Singly Circular</th><th>Doubly Circular</th><th>Notes</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Insert at front</td><td><span class="o-label o-best">O(1)</span></td><td><span class="o-label o-best">O(1)</span></td><td>Update tail.next → new head</td></tr>
+        <tr><td>Insert at back</td><td><span class="o-label o-best">O(1)</span></td><td><span class="o-label o-best">O(1)</span></td><td>With tail pointer</td></tr>
+        <tr><td>Delete at front</td><td><span class="o-label o-best">O(1)</span></td><td><span class="o-label o-best">O(1)</span></td><td>Must update tail.next</td></tr>
+        <tr><td>Delete at back</td><td><span class="o-label o-bad">O(n)</span></td><td><span class="o-label o-best">O(1)</span></td><td>Singly: need predecessor</td></tr>
+        <tr><td>Traverse full list</td><td><span class="o-label o-ok">O(n)</span></td><td><span class="o-label o-ok">O(n)</span></td><td>Stop when back at head</td></tr>
+        <tr><td>Detect if circular</td><td><span class="o-label o-ok">O(n)</span></td><td><span class="o-label o-ok">O(n)</span></td><td>Floyd's algorithm</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rt-section-head">🔁 Recursion</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="rt-table">
+      <thead><tr>
+        <th>Pattern</th><th>Time</th><th>Space (call stack)</th><th>Example</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Linear recursion</td><td><span class="o-label o-ok">O(n)</span></td><td><span class="o-label o-ok">O(n)</span></td><td>Factorial, linked list traversal</td></tr>
+        <tr><td>Binary recursion</td><td><span class="o-label o-ok">O(2ⁿ)</span></td><td><span class="o-label o-ok">O(n)</span></td><td>Naive Fibonacci</td></tr>
+        <tr><td>Divide & conquer (halving)</td><td><span class="o-label o-good">O(n log n)</span></td><td><span class="o-label o-good">O(log n)</span></td><td>Merge sort</td></tr>
+        <tr><td>Tail recursion</td><td><span class="o-label o-ok">O(n)</span></td><td><span class="o-label o-best">O(1)*</span></td><td>Optimized by compiler</td></tr>
+        <tr><td>Loop → Recursion conversion</td><td><span class="o-label o-ok">O(n)</span></td><td><span class="o-label o-ok">O(n)</span></td><td>Each iteration = one stack frame</td></tr>
+        <tr><td>Recursive LL insert at front</td><td><span class="o-label o-best">O(1)</span></td><td><span class="o-label o-best">O(1)</span></td><td>Base: empty list; Rec: not needed</td></tr>
+        <tr><td>Recursive LL insert at back</td><td><span class="o-label o-ok">O(n)</span></td><td><span class="o-label o-ok">O(n)</span></td><td>Traverse to end recursively</td></tr>
+        <tr><td>Recursive LL reverse</td><td><span class="o-label o-ok">O(n)</span></td><td><span class="o-label o-ok">O(n)</span></td><td>Unwind call stack rewires links</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:24px;">
+    <div class="card-title">Key Insight: Why These Differences Matter</div>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content"><strong>Arrays vs Linked Lists:</strong> Arrays win on <code>access O(1)</code> because memory is contiguous — the CPU computes <code>address = base + index × size</code>. Linked lists win on <code>front insertion O(1)</code> because no shifting is needed.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content"><strong>Singly vs Doubly:</strong> Adding a <code>prev</code> pointer trades space for time. Back-deletion drops from <code>O(n)</code> to <code>O(1)</code> — the biggest win.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content"><strong>Recursion space:</strong> Every recursive call uses a stack frame. A loop uses <code>O(1)</code> space; equivalent recursion uses <code>O(n)</code>. Tail-call optimization can fix this — but Java/Python don't do it by default.</div>
+    </div>
   </div>
 </div>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">studystudy</div>
-  <span class="footer-copy">© 2026 · Data Structures AI Tutor</span>
-  <ul class="footer-links">
-    <li><a href="#features">Features</a></li>
-    <li><a href="#topics">Topics</a></li>
-    <li><a href="#how">How It Works</a></li>
-  </ul>
-</footer>
+<!-- ═══════════════════════════════ CONCEPTS ═══════════════════════════════ -->
+<div id="tab-concepts" class="section">
+  <div class="section-title">Core Concepts</div>
+  <div class="section-sub">Step-by-step walkthroughs of key operations</div>
+
+  <div class="card">
+    <div class="card-title">Loop → Recursion Conversion</div>
+    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Identify the loop variable.</strong> Every <code>for/while</code> loop has a variable that changes each iteration (e.g., <code>i</code>, <code>current</code>). This becomes your recursion parameter.</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Base case = loop termination.</strong> When does the loop stop? <code>i &gt;= n</code> or <code>current == null</code>. That exact condition becomes your <code>if (base_case) return</code>.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Recursive call = loop body + increment.</strong> Do the loop body's work, then call yourself with the updated parameter: <code>f(i+1)</code> or <code>f(current.next)</code>.</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Example:</strong> <code>for(i=0;i&lt;n;i++) print(arr[i])</code> becomes <code>void print(arr, i, n) { if(i==n) return; print(arr[i]); print(arr, i+1, n); }</code></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Singly Linked List: Insert at Front</div>
+    <div class="step"><div class="step-num">1</div><div class="step-content">Create a new node: <code>Node newNode = new Node(data)</code></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content">Point new node's <code>next</code> to current head: <code>newNode.next = head</code></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content">Update head to new node: <code>head = newNode</code></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Why O(1)?</strong> We only touch 2 pointers — no traversal needed.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Singly Linked List: Delete from Back</div>
+    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Edge case:</strong> If list has 0 or 1 node, handle separately.</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content">Traverse until <code>current.next.next == null</code> — stop at the second-to-last node.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content">Set <code>current.next = null</code> — this severs the last node.</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Why O(n)?</strong> We have no <code>prev</code> pointer, so we must walk the whole list to find the predecessor.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Doubly Linked List: Delete from Back</div>
+    <div class="step"><div class="step-num">1</div><div class="step-content">Access <code>tail.prev</code> — the second-to-last node. Instantly available!</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content">Set <code>tail.prev.next = null</code></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content">Update <code>tail = tail.prev</code></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Why O(1)?</strong> The <code>prev</code> pointer gives us direct access to the predecessor — no traversal.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Circular Linked List: Key Quirks</div>
+    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>No null terminator:</strong> The last node's <code>next</code> points back to head. Loop detection uses <code>current != head</code> as the stop condition.</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Insert at front:</strong> You must also update <code>tail.next = newHead</code>. Forgetting this breaks the circle.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Infinite loop risk:</strong> Always track when you've returned to head, or your traversal loops forever.</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Use case:</strong> Round-robin scheduling, music playlists, any cyclic rotation problem.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Recursion: The Call Stack Analogy</div>
+    <div class="step"><div class="step-num">1</div><div class="step-content">Think of recursion as a stack of sticky notes. Each call writes its local variables on a note and stacks it on top.</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content">The base case is the point where you stop adding notes and start peeling them off.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content">When you peel off a note (return), the previous note resumes — this is how return values propagate back up.</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Stack overflow</strong> = too many notes. Missing or wrong base case keeps adding notes until memory runs out.</div></div>
+  </div>
+</div>
 
 <script>
-  // Custom cursor
-  const cursor = document.getElementById('cursor');
-  const cursorRing = document.getElementById('cursorRing');
-  document.addEventListener('mousemove', e => {
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top = e.clientY + 'px';
-    setTimeout(() => {
-      cursorRing.style.left = e.clientX + 'px';
-      cursorRing.style.top = e.clientY + 'px';
-    }, 80);
-  });
+// ═══════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════
 
-  // Scroll reveal
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 80);
-      }
-    });
-  }, { threshold: 0.1 });
-  reveals.forEach(el => observer.observe(el));
+const allQuestions = [
+  // ARRAYS
+  { topic:'array', q:"What is the time complexity of accessing an element by index in an array?", options:["O(n)","O(log n)","O(1)","O(n²)"], answer:2, explain:"Arrays store elements in contiguous memory. The CPU computes: address = base + index × element_size in one step — no traversal needed." },
+  { topic:'array', q:"You need to insert an element at the front of an unsorted array of size n. What is the time complexity?", options:["O(1)","O(log n)","O(n)","O(n log n)"], answer:2, explain:"Every existing element must be shifted one position to the right to make room. That's n shifts → O(n)." },
+  { topic:'array', q:"What is the amortized time complexity of appending to a dynamic array (like ArrayList/Python list)?", options:["O(n) always","O(1) amortized","O(log n)","O(n²)"], answer:1, explain:"Most appends are O(1). When the array is full, it doubles its capacity — copying n elements once. Averaging the copy cost over n insertions gives O(1) amortized." },
+  { topic:'array', q:"Which operation is FASTER in an array compared to a singly linked list?", options:["Insert at front","Delete from front","Access element at index k","Insert at back (no tail pointer)"], answer:2, explain:"Array index access is O(1) via direct address calculation. Linked list must traverse k nodes → O(k)." },
+  { topic:'array', q:"An array has elements [3, 7, 1, 9, 4]. After deleting the element at index 1 (value 7), what does the array look like?", options:["[3, 1, 9, 4]","[3, 7, 9, 4]","[7, 1, 9, 4]","[3, 1, 9, 4, 0]"], answer:0, explain:"Deleting at index 1 shifts all elements after it left by one: [3, 1, 9, 4]. The array shrinks by 1." },
+  { topic:'array', q:"What advantage does a static array have over a dynamic array?", options:["Faster insertion","Can grow dynamically","No reallocation overhead, predictable memory","Faster search"], answer:2, explain:"Static arrays never reallocate. The size is fixed at compile time, so there's zero overhead from resize operations — important in embedded/real-time systems." },
 
-  // Demo chat
-  const demoResponses = [
-    "Good question! Before I answer — can you tell me what a <code>head</code> pointer actually <em>is</em> in a linked list? What does it store?",
-    "Close! Remember: the head pointer stores the <em>address</em> of the first node, not the node itself. So when deleting from the front, you need to: 1) save <code>head.next</code>, 2) update head. Can you tell me why we save it first?",
-    "Exactly right! That's the key insight. Now here's a harder one: what's the time complexity of inserting at the <em>end</em> of a singly linked list, and why?",
-    "O(n) — correct! Because we have to traverse to the tail. Now: how would a <em>doubly</em> linked list change that? Think about what extra pointer we'd have access to.",
-    "You're getting it! The tail pointer in a doubly linked list gives us O(1) insertion at the back. Let's test this with recursion next — can you describe in one sentence what a base case is?",
-  ];
-  let demoIdx = 0;
-  function sendDemo() {
-    const input = document.getElementById('demoInput');
-    const msgs = document.getElementById('chatMessages');
-    const val = input.value.trim();
-    if (!val) return;
-    // User msg
-    msgs.innerHTML += `<div class="msg"><div class="msg-avatar user">YOU</div><div class="msg-body"><div class="msg-name">you</div><div class="msg-text">${val}</div></div></div>`;
-    input.value = '';
-    // AI response
-    setTimeout(() => {
-      const resp = demoResponses[demoIdx % demoResponses.length];
-      demoIdx++;
-      msgs.innerHTML += `<div class="msg"><div class="msg-avatar ai">SS</div><div class="msg-body"><div class="msg-name">studystudy</div><div class="msg-text ai-msg">${resp}</div></div></div>`;
-      msgs.scrollTop = msgs.scrollHeight;
-    }, 700);
-    msgs.scrollTop = msgs.scrollHeight;
+  // SINGLY LINKED LIST
+  { topic:'sll', q:"What is the time complexity of inserting a node at the FRONT of a singly linked list?", options:["O(1)","O(n)","O(log n)","Depends on list size"], answer:0, explain:"Just create the node, set newNode.next = head, update head = newNode. Only 2 pointer operations — no traversal." },
+  { topic:'sll', q:"Why is deleting the LAST node from a singly linked list O(n)?", options:["Nodes are stored non-contiguously","We must find the second-to-last node to update its next pointer","The tail pointer doesn't exist","Memory must be defragmented"], answer:1, explain:"Without a prev pointer, we must start at head and walk until current.next.next == null to find the predecessor. That's O(n) traversal." },
+  { topic:'sll', q:"A singly linked list has nodes: 1 → 3 → 5 → 7. You call insertFront(2). What is the new list?", options:["1 → 2 → 3 → 5 → 7","2 → 1 → 3 → 5 → 7","1 → 3 → 5 → 7 → 2","2 → 3 → 5 → 7"], answer:1, explain:"insertFront creates node(2), sets 2.next = 1 (current head), then updates head = 2. Result: 2 → 1 → 3 → 5 → 7." },
+  { topic:'sll', q:"Which of the following correctly describes the steps to insert a node AFTER a given node X in a singly linked list?", options:["newNode.next = X; X.next = newNode","newNode.next = X.next; X.next = newNode","X.next = newNode; newNode.next = X.next","newNode.next = X; X.next = X.next"], answer:1, explain:"Order matters! First save X.next by pointing newNode.next to it, THEN update X.next = newNode. Reversing the order loses the rest of the list." },
+  { topic:'sll', q:"What is the worst-case time complexity to SEARCH for a value in an unsorted singly linked list?", options:["O(1)","O(log n)","O(n)","O(n²)"], answer:2, explain:"No random access, no sorting to exploit. Must check each node one by one from head — O(n) in the worst case (element at tail or not present)." },
+  { topic:'sll', q:"How do you detect if a singly linked list has a cycle?", options:["Count nodes until null","Use Floyd's slow/fast pointer algorithm","Check if head.next == head","Use recursion with a visited array"], answer:1, explain:"Floyd's: use two pointers, slow (1 step) and fast (2 steps). If they meet, there's a cycle. If fast reaches null, no cycle. This runs O(n) time, O(1) space." },
+
+  // DOUBLY LINKED LIST
+  { topic:'dll', q:"What is the key structural difference between a singly and doubly linked list?", options:["Doubly linked lists store more data","Each node in a doubly LL has both next AND prev pointers","Doubly linked lists can only be traversed forward","Doubly linked lists use arrays internally"], answer:1, explain:"Each node in a doubly linked list stores two pointers: next (successor) and prev (predecessor). This enables O(1) back-deletion and bidirectional traversal." },
+  { topic:'dll', q:"Deleting the last node in a doubly linked list with a tail pointer is O(1). Why?", options:["The list is sorted","We access tail.prev directly — no traversal needed","Doubly LLs use hashing","The compiler optimizes it"], answer:1, explain:"tail.prev gives instant access to the second-to-last node. We set tail.prev.next = null and tail = tail.prev. No traversal — O(1)." },
+  { topic:'dll', q:"What is the extra SPACE cost of a doubly linked list compared to a singly linked list?", options:["O(n) extra space","One additional pointer per node (prev)","Double the total memory","No difference"], answer:1, explain:"Each of the n nodes stores an extra prev pointer. So total extra space is n pointers — which is O(n) overhead, but more precisely: 1 pointer per node." },
+  { topic:'dll', q:"In a doubly linked list, to insert a node between nodes A and B, how many pointer updates are needed?", options:["2","3","4","6"], answer:2, explain:"newNode.next = B; newNode.prev = A; A.next = newNode; B.prev = newNode. That's exactly 4 pointer updates." },
+
+  // CIRCULAR LINKED LIST
+  { topic:'cll', q:"What is the key structural feature of a circular linked list?", options:["The head node has no prev pointer","The last node's next pointer points back to the head","Every node stores its index","The list is always sorted"], answer:1, explain:"In a circular linked list, tail.next = head (instead of null). This creates a closed loop — there is no null terminator." },
+  { topic:'cll', q:"What common bug occurs when traversing a circular linked list without proper termination?", options:["Stack overflow","Null pointer exception","Infinite loop","Memory leak"], answer:2, explain:"Since there's no null to signal the end, traversal that doesn't check for return-to-head loops forever." },
+  { topic:'cll', q:"When inserting at the FRONT of a circular singly linked list, which extra pointer update is REQUIRED compared to a regular singly linked list?", options:["head.next = null","tail.next = newHead","newHead.next = null","No extra update needed"], answer:1, explain:"In a circular LL, tail.next must always point to head. After updating head to newHead, you must set tail.next = newHead to maintain the circular structure." },
+  { topic:'cll', q:"Which real-world scenario is BEST modeled by a circular linked list?", options:["A sorted phone book","Turn-based multiplayer game (round-robin)","A stack of plates","A binary search tree"], answer:1, explain:"Round-robin scheduling cycles through players/processes repeatedly. Circular LL naturally represents this: after the last player, next points back to the first." },
+
+  // RECURSION
+  { topic:'recursion', q:"What are the TWO required components of every recursive function?", options:["A loop and a counter","A base case and a recursive case","A stack and a queue","An input and an output"], answer:1, explain:"Every recursive function needs: (1) a base case — the condition to stop, and (2) a recursive case — the function calling itself with a smaller/simpler input, moving toward the base case." },
+  { topic:'recursion', q:"Converting a loop to recursion: the loop's termination condition becomes the recursion's ___", options:["Recursive call","Return value","Base case","Stack frame"], answer:2, explain:"The condition under which the loop stops (e.g., i >= n or current == null) becomes the base case — the condition under which the recursion returns without calling itself again." },
+  { topic:'recursion', q:"What is the space complexity of a recursive function that traverses a linked list of n nodes?", options:["O(1)","O(log n)","O(n)","O(n²)"], answer:2, explain:"Each recursive call creates a new stack frame. For n nodes, there are n recursive calls on the call stack simultaneously before unwinding → O(n) space." },
+  { topic:'recursion', q:"What happens if you write a recursive function without a base case?", options:["It returns 0","It compiles but runs slowly","It causes a stack overflow","It returns null"], answer:2, explain:"Without a base case, the function calls itself infinitely. The call stack grows until it exhausts all available memory → StackOverflowError." },
+  { topic:'recursion', q:"A recursive function to insert at the back of a linked list has what time complexity?", options:["O(1)","O(log n)","O(n)","O(n²)"], answer:2, explain:"To insert at the back recursively, you call f(current.next) until current.next == null. That's n recursive calls → O(n) time and O(n) stack space." },
+  { topic:'recursion', q:"Which of the following is the CORRECT recursive structure for computing factorial(n)?", options:["if n==0 return 1; else return n * factorial(n+1)","if n==1 return n; else return factorial(n-1)","if n==0 return 1; else return n * factorial(n-1)","if n==0 return 0; else return n + factorial(n-1)"], answer:2, explain:"Base case: factorial(0) = 1. Recursive case: n! = n × (n-1)!. So: if(n==0) return 1; else return n * factorial(n-1)." },
+  { topic:'recursion', q:"You have a loop: for(i=1; i<=n; i++) sum += i. What is its equivalent recursive base case?", options:["i == n","i == 0","i > n","sum == 0"], answer:1, explain:"The loop continues while i <= n, so it stops when i > n (which is equivalent to i = n+1). In recursion, the base case is when i > n: return 0 (add nothing more)." },
+];
+
+const allFlashcards = [
+  // ARRAYS
+  { topic:'array', q:"What is the time complexity of array index access and why?", a:"O(1) — arrays store elements in contiguous memory. Address = base + index × size is computed in one arithmetic operation." },
+  { topic:'array', q:"Why is inserting at the front of an array O(n)?", a:"All existing elements must shift one position right to make room. n shifts = O(n)." },
+  { topic:'array', q:"What does 'amortized O(1)' mean for dynamic array append?", a:"Most appends are O(1). Occasionally the array doubles (O(n) copy), but averaging that cost over all n insertions gives O(1) per operation." },
+  { topic:'array', q:"Static array vs Dynamic array — name one key difference.", a:"Static: fixed size set at creation, no resize overhead. Dynamic: can grow, but resizing copies all elements." },
+  { topic:'array', q:"What is the time complexity of deleting from the back of an array?", a:"O(1) — just decrement the size counter. No shifting needed." },
+  // SINGLY LL
+  { topic:'sll', q:"How do you insert at the front of a singly linked list? What's the complexity?", a:"1) newNode.next = head  2) head = newNode. Complexity: O(1) — only 2 pointer updates, no traversal." },
+  { topic:'sll', q:"Why is deleting the last node of a singly linked list O(n)?", a:"No prev pointer exists. Must traverse from head until current.next.next == null to find the predecessor node." },
+  { topic:'sll', q:"What is the correct pointer order when inserting after node X?", a:"FIRST: newNode.next = X.next  SECOND: X.next = newNode. Reversing these loses the rest of the list." },
+  { topic:'sll', q:"What is Floyd's Cycle Detection algorithm?", a:"Use two pointers: slow (1 step/iteration) and fast (2 steps/iteration). If they meet → cycle exists. If fast hits null → no cycle. O(n) time, O(1) space." },
+  { topic:'sll', q:"What is the time complexity of searching in an unsorted singly linked list?", a:"O(n) — no random access, no sorting to exploit. Must check each node from head." },
+  // DOUBLY LL
+  { topic:'dll', q:"What is the main advantage of a doubly linked list over a singly linked list?", a:"Each node has a prev pointer, enabling O(1) back-deletion and O(1) predecessor access — without traversal." },
+  { topic:'dll', q:"How many pointer updates are needed to insert a node between A and B in a doubly LL?", a:"4 updates: newNode.next = B; newNode.prev = A; A.next = newNode; B.prev = newNode." },
+  { topic:'dll', q:"Why is back-deletion O(1) in a doubly LL but O(n) in a singly LL?", a:"Doubly LL: tail.prev gives instant predecessor access. Singly LL: must traverse the whole list to find the second-to-last node." },
+  { topic:'dll', q:"What extra space does a doubly linked list use per node?", a:"One additional pointer (prev) per node. Total: O(n) extra space across all nodes." },
+  // CIRCULAR LL
+  { topic:'cll', q:"What defines a circular linked list structurally?", a:"The last node's next pointer points back to head (no null terminator). Creates a closed loop." },
+  { topic:'cll', q:"What common mistake causes an infinite loop when traversing a circular LL?", a:"Not checking for return-to-head as a stop condition. Since there's no null, traversal never terminates." },
+  { topic:'cll', q:"When inserting at front of a circular singly LL, what extra step vs regular LL?", a:"Must update tail.next = newHead after inserting. Forgetting this breaks the circular structure." },
+  { topic:'cll', q:"Name a real-world use case for circular linked lists.", a:"Round-robin scheduling (OS processes, multiplayer game turns), music playlist loops, token ring networks." },
+  // RECURSION
+  { topic:'recursion', q:"What are the two required parts of every recursive function?", a:"1) Base case: the stopping condition (no recursive call). 2) Recursive case: calls itself with a simpler/smaller input." },
+  { topic:'recursion', q:"When converting a for-loop to recursion, what does the loop's termination condition become?", a:"The base case of the recursion — the condition under which the function returns without calling itself." },
+  { topic:'recursion', q:"What is the space complexity of recursive linked list traversal and why?", a:"O(n) — each recursive call adds a stack frame. All n frames exist simultaneously on the call stack." },
+  { topic:'recursion', q:"What happens without a base case in a recursive function?", a:"Stack overflow — the function calls itself infinitely, filling up the call stack until memory is exhausted." },
+  { topic:'recursion', q:"What is tail recursion and why does it matter?", a:"When the recursive call is the LAST operation. Some languages/compilers optimize this to O(1) stack space — reusing the same stack frame." },
+  { topic:'recursion', q:"Write the base and recursive case for recursive factorial.", a:"Base: if(n==0) return 1;  Recursive: return n * factorial(n-1);" },
+];
+
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let quizFilter = 'all';
+let filteredQ = [];
+let quizIndex = 0;
+let score = 0;
+let answered = false;
+let wrongAnswers = [];
+
+let fcFilter = 'all';
+let filteredFC = [];
+let fcIndex = 0;
+
+// ═══════════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════════
+function switchTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════
+//  QUIZ
+// ═══════════════════════════════════════════════════
+function setQuizFilter(f, btn) {
+  quizFilter = f;
+  document.querySelectorAll('.quiz-filter .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  restartQuiz();
+}
+
+function getFiltered() {
+  if (quizFilter === 'all') return [...allQuestions];
+  return allQuestions.filter(q => q.topic === quizFilter);
+}
+
+function shuffle(arr) {
+  let a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
-  document.getElementById('demoInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') sendDemo();
+  return a;
+}
+
+function restartQuiz(retryWrong = false) {
+  filteredQ = retryWrong && wrongAnswers.length ? shuffle(wrongAnswers) : shuffle(getFiltered());
+  quizIndex = 0; score = 0; wrongAnswers = [];
+  answered = false;
+  document.getElementById('result-area').classList.add('hidden');
+  document.getElementById('quiz-area').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (quizIndex >= filteredQ.length) { showResult(); return; }
+  const q = filteredQ[quizIndex];
+  answered = false;
+  document.getElementById('quiz-question').textContent = q.q;
+  document.getElementById('quiz-meta').textContent = `Question ${quizIndex + 1} of ${filteredQ.length} · ${q.topic.toUpperCase()}`;
+  document.getElementById('progress-bar').style.width = ((quizIndex / filteredQ.length) * 100) + '%';
+  document.getElementById('score-badge').textContent = `Score: ${score}/${quizIndex}`;
+  document.getElementById('feedback-box').className = 'feedback-box';
+  document.getElementById('feedback-box').textContent = '';
+  document.getElementById('next-btn').classList.add('hidden');
+
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = `${String.fromCharCode(65+i)}) ${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    grid.appendChild(btn);
   });
+}
+
+function selectAnswer(chosen) {
+  if (answered) return;
+  answered = true;
+  const q = filteredQ[quizIndex];
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.answer) b.classList.add('correct');
+    else if (i === chosen) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('feedback-box');
+  if (chosen === q.answer) {
+    score++;
+    fb.className = 'feedback-box correct';
+    fb.textContent = '✓ Correct! ' + q.explain;
+  } else {
+    wrongAnswers.push(q);
+    fb.className = 'feedback-box wrong';
+    fb.textContent = '✗ Not quite. ' + q.explain;
+  }
+  document.getElementById('score-badge').textContent = `Score: ${score}/${quizIndex+1}`;
+  document.getElementById('next-btn').classList.remove('hidden');
+}
+
+function nextQuestion() {
+  quizIndex++;
+  renderQuestion();
+}
+
+function showResult() {
+  document.getElementById('quiz-area').classList.add('hidden');
+  document.getElementById('result-area').classList.remove('hidden');
+  const pct = Math.round((score / filteredQ.length) * 100);
+  document.getElementById('result-score').textContent = `${pct}%`;
+  let msg = '';
+  if (pct >= 90) msg = `Excellent! ${score}/${filteredQ.length} correct — you're quiz-ready. 🎓`;
+  else if (pct >= 70) msg = `Good work! ${score}/${filteredQ.length} correct. Review the wrong answers.`;
+  else if (pct >= 50) msg = `${score}/${filteredQ.length} correct. Focus on the concepts tab and retry.`;
+  else msg = `${score}/${filteredQ.length} — check the Concepts and Runtimes tabs, then retry!`;
+  document.getElementById('result-msg').textContent = msg;
+}
+
+// ═══════════════════════════════════════════════════
+//  FLASHCARDS
+// ═══════════════════════════════════════════════════
+function getFCFiltered() {
+  if (fcFilter === 'all') return [...allFlashcards];
+  return allFlashcards.filter(f => f.topic === fcFilter);
+}
+
+function setFCFilter(f, btn) {
+  fcFilter = f;
+  document.querySelectorAll('.fc-category .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filteredFC = getFCFiltered();
+  fcIndex = 0;
+  renderCard();
+}
+
+function renderCard() {
+  const card = filteredFC[fcIndex];
+  document.getElementById('fc-front-text').textContent = card.q;
+  document.getElementById('fc-back-text').textContent = card.a;
+  document.getElementById('fc-counter').textContent = `${fcIndex + 1} / ${filteredFC.length}`;
+  document.getElementById('flashcard').classList.remove('flipped');
+}
+
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+}
+
+function prevCard() {
+  fcIndex = (fcIndex - 1 + filteredFC.length) % filteredFC.length;
+  renderCard();
+}
+
+function nextCard() {
+  fcIndex = (fcIndex + 1) % filteredFC.length;
+  renderCard();
+}
+
+function shuffleCards() {
+  filteredFC = shuffle(filteredFC);
+  fcIndex = 0;
+  renderCard();
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+filteredFC = getFCFiltered();
+renderCard();
+restartQuiz();
 </script>
 </body>
 </html>
